@@ -74,7 +74,7 @@ setInterval(()=>{if(active){document.getElementById('earned').textContent=((Date
     status.textContent =
       "Terhubung! Saldo DCX: " + result.user.balance;
   } catch (error) {
-    status.textContent = "Koneksi gagal: " + error.message;
+    status.textContent = "Koneksi gagal: " + (error?.message || JSON.stringify(error));
   }
 })();
 </script>
