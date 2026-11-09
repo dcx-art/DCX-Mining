@@ -68,7 +68,11 @@ setInterval(()=>{if(active){document.getElementById('earned').textContent=((Date
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.error || "Gagal terhubung");
+      throw new Error(
+  typeof result.error === "string"
+    ? result.error
+    : JSON.stringify(result.error)
+);
     }
 
     status.textContent =
