@@ -38,4 +38,45 @@ function copyRef(){navigator.clipboard?.writeText(document.getElementById('refLi
 function withdraw(){let a=Number(document.getElementById('amount').value),w=document.getElementById('wallet').value.trim();let msg=document.getElementById('wdmsg');if(!w||!a||a<10){msg.textContent='Isi alamat wallet dan jumlah minimal 10 DCX.';return;}if(a>balance){msg.textContent='Saldo demo tidak cukup.';return;}msg.textContent='Permintaan withdraw DEMO diterima di layar ini saja. Tidak ada transaksi blockchain.';}
 setInterval(()=>{if(active){document.getElementById('earned').textContent=((Date.now()-startAt)/3600000*rate).toFixed(4)+' DCX';}render();},5000);render();
 </script>
-</body></html>
+<script>
+(async function () {
+  const status = document.createElement("p");
+  status.textContent = "Menghubungkan ke DCX...";
+  document.body.appendChild(status);
+
+  const tg = window.Telegram?.WebApp;
+  tg?.ready();
+
+  if (!tg || !tg.initData) {
+    status.textContent = "Silakan buka melalui Telegram.";
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/dynamic-api",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": "sb_publishable_ts1Ofuwy7cat9DEX6NyI-Q_ZeLx3pwI"
+        },
+        body: JSON.stringify({ initData: tg.initData })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Gagal terhubung");
+    }
+
+    status.textContent =
+      "Terhubung! Saldo DCX: " + result.user.balance;
+  } catch (error) {
+    status.textContent = "Koneksi gagal: " + error.message;
+  }
+})();
+</script>
+</body>
+</html>
