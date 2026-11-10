@@ -201,8 +201,25 @@ margin-top:12px;
 </head>
 <body><div class="wrap">
 <header class="top"><div class="brand">DCX <span>MINING</span></div><div class="pill" id="userTag">DCX Demo</div></header>
-<div class="card"><div class="label">Total balance</div><div class="balance"><span id="balance">0.0000</span> <span class="token">DCX</span></div><div class="small">Saldo demo • belum token DCX on-chain</div><div class="small" style="margin-top:5px">Jetton Master: EQBngyvuH7wWCW_sYUyC0iyb7uPFvkG2eiR0BscnMqa_k6AS • decimals: 9</div>
-<div class="stats" style="margin-top:15px"><div class="stat"><div class="label">Mining rate</div><b id="rate">0.10 DCX/jam</b></div><div class="stat"><div class="label">Mining status</div><b id="status">Tidak aktif</b></div></div></div>
+<div class="card">
+  <div class="label">TOTAL BALANCE</div>
+  <div class="balance">
+    <span id="balance">0.0000</span>
+    <span class="token">DCX</span>
+  </div>
+  <div class="small">Your DCX mining assets</div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="label">MINING SPEED</div>
+      <b>10 DCX/h</b>
+    </div>
+    <div class="stat">
+      <div class="label">MINING STATUS</div>
+      <b id="status">Inactive</b>
+    </div>
+  </div>
+</div>
 <div class="tabs"><button class="active" onclick="tab('mine',this)">⛏ Mining</button><button class="secondary" onclick="tab('ref',this)">♧ Referral</button><button class="secondary" onclick="tab('level',this)">⚡ Level</button><button class="secondary" onclick="tab('wd',this)">↗ Withdraw</button></div>
 <section id="mine" class="section show"><div class="card mining"><div class="orb" id="orb">⛏</div><div class="label">Mining session</div><h2 id="earned">0.0000 DCX</h2><div class="small" id="timer">Mining belum dimulai</div><div style="margin-top:15px"><button id="mineBtn" onclick="toggleMine()">MULAI MINING</button></div></div></section>
 <section id="ref" class="section"><div class="card"><h3>Referral program</h3><p>Undang teman untuk mendapat bonus demo.</p><div class="label">Referral link</div><input id="refLink" readonly><button onclick="copyRef()">Salin link referral</button><p class="small" id="refCount">Referral: 0 • Bonus: 0 DCX</p></div></section>
