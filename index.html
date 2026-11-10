@@ -74,6 +74,10 @@ async function toggleMine(){
       await miningRequest('start_mining');
     }
     await refreshMining();
+    const connectionStatus=document.getElementById('connectionStatus');
+if(connectionStatus){
+  connectionStatus.textContent='Terhubung! Saldo DCX: '+balance.toFixed(4);
+}
   }catch(error){
     alert(error.message||'Mining gagal');
   }finally{
@@ -99,6 +103,7 @@ refreshMining().catch(error=>{
 <script>
 (async function () {
   const status = document.createElement("p");
+  status.id = "connectionStatus";
   status.textContent = "Menghubungkan ke DCX...";
   document.body.appendChild(status);
 
