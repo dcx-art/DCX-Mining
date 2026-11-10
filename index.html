@@ -56,7 +56,7 @@ async function miningRequest(action){
 }
 
 async function refreshMining(){
-  const result=await miningRequest('status');
+  const result=await miningRequest('status');console.log('STATUS MINING:',result);
   balance=Number(result.balance||0);
   active=Boolean(result.mining_active);
   pendingReward=Number(result.pending_reward||0);
