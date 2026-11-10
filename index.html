@@ -234,14 +234,14 @@ const params=new URLSearchParams(location.search);const start=params.get('starta
 const uid=tg?.initDataUnsafe?.user?.id||'demo-user';document.getElementById('refLink').value='https://t.me/dcxmining_bot?start='+uid;
 let balance=0, active=false, startAt=0, pendingReward=0;
 let rewardSnapshotAt=Date.now();
-const rate=10; document.getElementById('rate').textContent=rate.toFixed(2)+' DCX/jam';
+const rate=10; document.getElementById('rate').textContent=rate.toFixed(2)+' DCX/H';
 function render(){
   document.getElementById('balance').textContent=balance.toFixed(4);
   document.getElementById('status').textContent=active?'Aktif':'Tidak aktif';
   document.getElementById('orb').classList.toggle('active',active);
-  document.getElementById('mineBtn').textContent=active?'KLAIM REWARD':'MULAI MINING';
+  document.getElementById('mineBtn').textContent=active?'CLAIM DCX':'START MINING';
   document.getElementById('earned').textContent=pendingReward.toFixed(4)+' DCX';
-  document.getElementById('timer').textContent=active?'Mining aktif sejak '+new Date(startAt).toLocaleString('id-ID'):'Mining belum dimulai';
+  document.getElementById('timer').textContent=active?'Mining Active Since'+new Date(startAt).toLocaleString('id-ID'):'Mining Not Started';
 }
 
 async function miningRequest(action){
