@@ -350,6 +350,11 @@ refreshMining().catch(error=>{
     status.textContent = "Koneksi gagal: " + (error?.message || JSON.stringify(error));
   }
 })();
-</script>
+</script>  
+<style>
+#connectionStatus {
+  display: none !important;
+}
+</style> 
 </body>
 </html>
