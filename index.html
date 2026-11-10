@@ -233,6 +233,7 @@ const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();let u=tg.initDat
 const params=new URLSearchParams(location.search);const start=params.get('startapp')||tg?.initDataUnsafe?.start_param||'';
 const uid=tg?.initDataUnsafe?.user?.id||'demo-user';document.getElementById('refLink').value='https://t.me/dcxmining_bot?start='+uid;
 let balance=0, active=false, startAt=0, pendingReward=0;
+let rewardSnapshotAt=Date.now();
 const rate=10; document.getElementById('rate').textContent=rate.toFixed(2)+' DCX/jam';
 function render(){
   document.getElementById('balance').textContent=balance.toFixed(4);
@@ -262,7 +263,7 @@ async function refreshMining(){
   const result=await miningRequest('status');console.log('STATUS MINING:',result);
   balance=Number(result.balance||0);
   active=Boolean(result.mining_active);
-  pendingReward=Number(result.pending_reward||0);
+  pendingReward=Number(result.pending_reward||0);rewardSnapshotAt=Date.now();
   startAt=result.user?.mining_started_at
     ?new Date(result.user.mining_started_at).getTime():0;
   render();
@@ -294,10 +295,12 @@ render();
 
 setInterval(()=>{
   if(active){
-    pendingReward+=5*rate/3600;
-    document.getElementById('earned').textContent=pendingReward.toFixed(4)+' DCX';
+    const elapsed=(Date.now()-rewardSnapshotAt)/1000;
+    const currentReward=pendingReward+(elapsed*rate/3600);
+    document.getElementById('earned').textContent=
+      currentReward.toFixed(4)+' DCX';
   }
-},5000);
+},1000);
 
 refreshMining().catch(error=>{
   document.getElementById('timer').textContent=error.message||'Gagal memuat mining';
