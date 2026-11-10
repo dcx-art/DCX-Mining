@@ -5,12 +5,198 @@
 <title>DCX Mining — Telegram Mini App Demo</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--bg:#070b16;--panel:#111a2c;--panel2:#0c1424;--text:#eef4ff;--muted:#8ea1c2;--cyan:#42e8ff;--violet:#8b5cf6;--green:#43f5a5;--line:#24324c}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -15%,#1b2b55 0,#070b16 45%);color:var(--text);font:15px system-ui,-apple-system,sans-serif;padding:16px 14px 30px}
-.wrap{max-width:520px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin:8px 0 18px}.brand{font-weight:900;letter-spacing:2px;font-size:19px}.brand span{color:var(--cyan)}.pill{border:1px solid #314563;border-radius:20px;padding:7px 10px;color:var(--muted);font-size:12px}
-.card{background:linear-gradient(145deg,rgba(19,29,49,.97),rgba(10,16,29,.98));border:1px solid var(--line);border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 10px 35px #0003}
-.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px}.balance{font-size:34px;font-weight:800;margin:7px 0}.token{color:var(--cyan);font-size:14px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px}.stat b{display:block;font-size:20px;margin-top:5px}
-button{border:0;border-radius:12px;padding:13px 15px;font-weight:800;color:#06101b;background:linear-gradient(90deg,var(--cyan),#7cf7d4);width:100%;font-size:15px;cursor:pointer}.secondary{background:#17243b;color:var(--text);border:1px solid #2b4162}.mining{margin:18px 0;text-align:center}.orb{width:145px;height:145px;margin:10px auto 18px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#203e66 0,#101b32 55%,#07101f 70%);border:2px solid #2c7e9d;box-shadow:0 0 25px #24dfff33,inset 0 0 20px #42e8ff22;font-size:40px}.orb.active{box-shadow:0 0 35px #42e8ff66,inset 0 0 25px #42e8ff55;animation:pulse 1.8s infinite}@keyframes pulse{50%{transform:scale(1.03)}}.small{color:var(--muted);font-size:12px;line-height:1.5}.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0}.tabs button{font-size:12px;padding:11px 4px}.tabs button.active{background:linear-gradient(90deg,#42e8ff,#8b5cf6);color:#fff}.section{display:none}.section.show{display:block}.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0}.level{border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;background:#0b1322}.level.current{border-color:var(--cyan)}input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#080f1c;color:white;margin:8px 0}.notice{background:#342719;border:1px solid #75502a;color:#ffd8a3;border-radius:10px;padding:10px;font-size:12px;line-height:1.45;margin-top:12px}
+:root{
+--bg:#070b16;
+--panel:#111a2c;
+--panel2:#0c1424;
+--text:#f4f6ff;
+--muted:#94a3bd;
+--gold:#f5c76b;
+--gold2:#ffe6a6;
+--cyan:#42e8ff;
+--line:#34415a;
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+background:radial-gradient(circle at 50% -10%,#263b65 0,#0b1222 45%,#050914 100%);
+color:var(--text);
+font:15px system-ui,-apple-system,sans-serif;
+padding:16px 14px 30px;
+}
+.wrap{max-width:520px;margin:auto}
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:8px 0 20px;
+}
+.brand{
+font-weight:900;
+letter-spacing:3px;
+font-size:23px;
+color:var(--gold);
+text-shadow:0 0 15px #f5c76b44;
+}
+.brand span{color:var(--cyan)}
+.pill{
+border:1px solid #8d7545;
+border-radius:20px;
+padding:7px 12px;
+color:var(--gold2);
+font-size:12px;
+background:#171b28;
+}
+.card{
+background:linear-gradient(145deg,#17233a,#0b1323);
+border:1px solid #394968;
+border-radius:20px;
+padding:19px;
+margin:13px 0;
+box-shadow:0 12px 35px #0005;
+}
+.label{
+color:var(--muted);
+font-size:11px;
+text-transform:uppercase;
+letter-spacing:1.5px;
+}
+.balance{
+font-size:36px;
+font-weight:900;
+margin:9px 0;
+color:var(--gold2);
+text-shadow:0 0 18px #f5c76b22;
+overflow-wrap:anywhere;
+}
+.token{
+color:var(--gold);
+font-size:15px;
+}
+.stats{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+.stat{
+background:linear-gradient(145deg,#101d32,#0a1220);
+border:1px solid #34445f;
+border-radius:14px;
+padding:13px;
+}
+.stat b{
+display:block;
+font-size:18px;
+margin-top:6px;
+color:var(--cyan);
+}
+button{
+border:1px solid #f5d58c;
+border-radius:13px;
+padding:14px 15px;
+font-weight:900;
+color:#17120a;
+background:linear-gradient(100deg,#d9a844,#ffe5a0);
+width:100%;
+font-size:15px;
+cursor:pointer;
+box-shadow:0 5px 18px #d9a84422;
+}
+button:active{transform:scale(.98)}
+.secondary{
+background:linear-gradient(145deg,#172944,#101a2d);
+color:var(--text);
+border:1px solid #344968;
+box-shadow:none;
+}
+.mining{
+margin:18px 0;
+text-align:center;
+}
+.orb{
+width:150px;
+height:150px;
+margin:12px auto 20px;
+border-radius:50%;
+display:grid;
+place-items:center;
+background:radial-gradient(circle,#294b70 0,#142640 55%,#080f1e 75%);
+border:2px solid var(--gold);
+box-shadow:0 0 28px #f5c76b33,inset 0 0 25px #42e8ff22;
+font-size:42px;
+}
+.orb.active{
+box-shadow:0 0 35px #42e8ff77,inset 0 0 25px #42e8ff55;
+animation:pulse 1.8s infinite;
+}
+@keyframes pulse{
+50%{transform:scale(1.04)}
+}
+.small{
+color:var(--muted);
+font-size:12px;
+line-height:1.6;
+}
+.tabs{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:7px;
+margin:16px 0;
+}
+.tabs button{
+font-size:12px;
+padding:12px 3px;
+border-radius:11px;
+}
+.tabs button.active{
+background:linear-gradient(100deg,#d9a844,#ffe5a0);
+color:#17120a;
+border:1px solid #fff0bd;
+}
+.section{display:none}
+.section.show{display:block}
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+margin:12px 0;
+}
+.level{
+border:1px solid var(--line);
+border-radius:13px;
+padding:13px;
+margin:9px 0;
+background:#0b1425;
+}
+.level.current{
+border-color:var(--gold);
+box-shadow:0 0 12px #f5c76b18;
+}
+input{
+width:100%;
+padding:13px;
+border-radius:11px;
+border:1px solid #344968;
+background:#080f1c;
+color:white;
+margin:8px 0;
+}
+.notice{
+background:#292317;
+border:1px solid #796039;
+color:#f5dca8;
+border-radius:11px;
+padding:11px;
+font-size:12px;
+line-height:1.5;
+margin-top:12px;
+}
+@media(max-width:360px){
+.balance{font-size:29px}
+.tabs{gap:4px}
+.tabs button{font-size:10px;padding:11px 2px}
+}
 </style>
 </head>
 <body><div class="wrap">
