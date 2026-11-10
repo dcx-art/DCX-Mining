@@ -228,6 +228,7 @@ margin-top:12px;
 <div class="notice">Prototype front-end gratis. Data saldo disimpan di browser perangkat ini dan mudah diubah; jangan gunakan untuk uang sungguhan.</div>
 </div>
 <script>
+const MINING_API='https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/mining-api';
 const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();let u=tg.initDataUnsafe?.user;if(u)document.getElementById('userTag').textContent=u.first_name||'Telegram user';}
 const params=new URLSearchParams(location.search);const start=params.get('startapp')||tg?.initDataUnsafe?.start_param||'';
 const uid=tg?.initDataUnsafe?.user?.id||'demo-user';document.getElementById('refLink').value='https://t.me/dcxmining_bot?start='+uid;
@@ -241,7 +242,6 @@ function render(){
   document.getElementById('earned').textContent=pendingReward.toFixed(4)+' DCX';
   document.getElementById('timer').textContent=active?'Mining aktif sejak '+new Date(startAt).toLocaleString('id-ID'):'Mining belum dimulai';
 }
-const MINING_API='https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/mining-api';
 
 async function miningRequest(action){
   if(!tg?.initData) throw new Error('Buka aplikasi melalui Telegram');
