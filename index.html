@@ -28,15 +28,73 @@ button{border:0;border-radius:12px;padding:13px 15px;font-weight:800;color:#0610
 const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();let u=tg.initDataUnsafe?.user;if(u)document.getElementById('userTag').textContent=u.first_name||'Telegram user';}
 const params=new URLSearchParams(location.search);const start=params.get('startapp')||tg?.initDataUnsafe?.start_param||'';
 const uid=tg?.initDataUnsafe?.user?.id||'demo-user';document.getElementById('refLink').value='https://t.me/dcxmining_bot?start='+uid;
-let balance=Number(localStorage.novaBalance||0), active=localStorage.novaActive==='1', startAt=Number(localStorage.novaStart||0), lastTick=Date.now();
-const rate=.1; document.getElementById('rate').textContent=rate.toFixed(2)+' DCX/jam';
-function render(){document.getElementById('balance').textContent=balance.toFixed(4);document.getElementById('status').textContent=active?'Aktif':'Tidak aktif';document.getElementById('orb').classList.toggle('active',active);document.getElementById('mineBtn').textContent=active?'KLAIM & BERHENTI':'MULAI MINING';document.getElementById('earned').textContent=(active?Math.max(0,(Date.now()-startAt)/3600000*rate):0).toFixed(4)+' DCX';document.getElementById('timer').textContent=active?'Sesi dimulai '+new Date(startAt).toLocaleString('id-ID'):'Mining belum dimulai';}
-function save(){localStorage.novaBalance=balance;localStorage.novaActive=active?'1':'0';localStorage.novaStart=startAt;}
-function toggleMine(){if(active){balance+=Math.max(0,(Date.now()-startAt)/3600000*rate);active=false;startAt=0;}else{active=true;startAt=Date.now();}save();render();}
+let balance=0, active=false, startAt=0, pendingReward=0;
+const rate=10; document.getElementById('rate').textContent=rate.toFixed(2)+' DCX/jam';
+function render(){
+  document.getElementById('balance').textContent=balance.toFixed(4);
+  document.getElementById('status').textContent=active?'Aktif':'Tidak aktif';
+  document.getElementById('orb').classList.toggle('active',active);
+  document.getElementById('mineBtn').textContent=active?'KLAIM REWARD':'MULAI MINING';
+  document.getElementById('earned').textContent=pendingReward.toFixed(4)+' DCX';
+  document.getElementById('timer').textContent=active?'Mining aktif sejak '+new Date(startAt).toLocaleString('id-ID'):'Mining belum dimulai';
+}
+const MINING_API='https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/mining-api';
+
+async function miningRequest(action){
+  if(!tg?.initData) throw new Error('Buka aplikasi melalui Telegram');
+  const response=await fetch(MINING_API,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'apikey':'sb_publishable_ts1Ofuwy7cat9DEX6NyI-Q_ZeLx3pwI'
+    },
+    body:JSON.stringify({initData:tg.initData,action})
+  });
+  const result=await response.json();
+  if(!response.ok) throw new Error(result.error||'Koneksi mining gagal');
+  return result;
+}
+
+async function refreshMining(){
+  const result=await miningRequest('status');
+  balance=Number(result.balance||0);
+  active=Boolean(result.mining_active);
+  pendingReward=Number(result.pending_reward||0);
+  startAt=result.user?.mining_started_at
+    ?new Date(result.user.mining_started_at).getTime():0;
+  render();
+}
+async function toggleMine(){
+  const btn=document.getElementById('mineBtn');
+  btn.disabled=true;
+  try{
+    if(active){
+      await miningRequest('claim_mining');
+    }else{
+      await miningRequest('start_mining');
+    }
+    await refreshMining();
+  }catch(error){
+    alert(error.message||'Mining gagal');
+  }finally{
+    btn.disabled=false;
+  }
+}
 function tab(id,btn){document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));document.getElementById(id).classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');}
 function copyRef(){navigator.clipboard?.writeText(document.getElementById('refLink').value).then(()=>alert('Link disalin')); }
 function withdraw(){let a=Number(document.getElementById('amount').value),w=document.getElementById('wallet').value.trim();let msg=document.getElementById('wdmsg');if(!w||!a||a<10){msg.textContent='Isi alamat wallet dan jumlah minimal 10 DCX.';return;}if(a>balance){msg.textContent='Saldo demo tidak cukup.';return;}msg.textContent='Permintaan withdraw DEMO diterima di layar ini saja. Tidak ada transaksi blockchain.';}
-setInterval(()=>{if(active){document.getElementById('earned').textContent=((Date.now()-startAt)/3600000*rate).toFixed(4)+' DCX';}render();},5000);render();
+render();
+
+setInterval(()=>{
+  if(active){
+    pendingReward+=5*rate/3600;
+    document.getElementById('earned').textContent=pendingReward.toFixed(4)+' DCX';
+  }
+},5000);
+
+refreshMining().catch(error=>{
+  document.getElementById('timer').textContent=error.message||'Gagal memuat mining';
+});
 </script>
 <script>
 (async function () {
