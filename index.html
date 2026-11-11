@@ -404,5 +404,107 @@ refreshMining().catch(error=>{
   display: none !important;
 }
 </style> 
+
+<script>
+const REFERRAL_API =
+  'https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/referral-api';
+
+async function referralRequest(action) {
+  const tg = window.Telegram?.WebApp;
+
+  if (!tg?.initData) {
+    throw new Error('Please open DCX Mining through Telegram.');
+  }
+
+  const response = await fetch(REFERRAL_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': 'sb_publishable_ts1Ofuwy7cat9DEX6NyI-Q_ZeLx3pwI'
+    },
+    body: JSON.stringify({
+      action,
+      initData: tg.initData
+    })
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.message || 'Referral request failed');
+  }
+
+  return result;
+}
+
+async function loadReferral() {
+  const message = document.getElementById('refMessage');
+
+  try {
+    const result = await referralRequest('status');
+
+    document.getElementById('refLink').value =
+      result.referral_link;
+
+    document.getElementById('refCount').textContent =
+      result.referral_count;
+
+    document.getElementById('refReward').textContent =
+      Number(result.unclaimed_reward).toFixed(2) + ' DCX';
+
+    document.getElementById('refClaimed').textContent =
+      Number(result.claimed_reward).toFixed(2) + ' DCX';
+
+    message.textContent = 'Referral data updated successfully.';
+  } catch (error) {
+    message.textContent = error.message;
+  }
+}
+
+async function copyRef() {
+  const link = document.getElementById('refLink').value;
+
+  if (!link) {
+    alert('Referral link is not available yet.');
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(link);
+    alert('Referral link copied!');
+  } catch {
+    document.getElementById('refLink').select();
+    alert('Please copy the referral link manually.');
+  }
+}
+
+async function claimReferral() {
+  const button = document.getElementById('claimRefBtn');
+  const message = document.getElementById('refMessage');
+
+  button.disabled = true;
+
+  try {
+    const result = await referralRequest('claim');
+
+    message.textContent =
+      result.message + ' — ' +
+      Number(result.claimed).toFixed(2) + ' DCX';
+
+    await loadReferral();
+
+    if (typeof refreshMining === 'function') {
+      await refreshMining();
+    }
+  } catch (error) {
+    message.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+loadReferral();
+</script>
+  
 </body>
 </html>
