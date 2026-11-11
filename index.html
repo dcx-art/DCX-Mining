@@ -506,14 +506,42 @@ async function claimReferral() {
 
 (async function() {
   const message = document.getElementById('refMessage');
+  let result = null;
 
-  try {
-    const result = await referralRequest('register');
+  for (let attempt = 1; attempt <= 10; attempt++) {
+    try {
+      result = await referralRequest('register');
 
+      if (
+        (result.message || '').includes('Your account is not registered yet') &&
+        attempt < 10
+      ) {
+        message.textContent = 'Preparing account... Retrying ' + attempt + '/10';
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        continue;
+      }
+
+      break;
+    } catch (error) {
+      const errorMessage = error.message || '';
+
+      if (
+        errorMessage.includes('Your account is not registered yet') &&
+        attempt < 10
+      ) {
+        message.textContent = 'Preparing account... Retrying ' + attempt + '/10';
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        continue;
+      }
+
+      message.textContent = errorMessage;
+      return;
+    }
+  }
+
+  if (result) {
     message.textContent = result.message || 'Registration completed.';
     await loadReferral();
-  } catch (error) {
-    message.textContent = error.message;
   }
 })();
   
