@@ -280,7 +280,7 @@ const MINING_API='https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/mining-a
 const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();let u=tg.initDataUnsafe?.user;if(u)document.getElementById('userTag').textContent=u.first_name||'Telegram user';}
 const params = new URLSearchParams(location.search);
 const start = params.get('startapp') || params.get('tgWebAppStartParam') || tg?.initDataUnsafe?.start_param || '';
-const uid=tg?.initDataUnsafe?.user?.id||'demo-user';document.getElementById('refLink').value='https://t.me/dcxmining_bot?start='+uid;
+const uid=tg?.initDataUnsafe?.user?.id||'demo-user';document.getElementById('refLink').value='https://t.me/dcxmining_bot/DCXMining?startapp='+uid;
 let balance=0, active=false, startAt=0, pendingReward=0;
 let rewardSnapshotAt=Date.now();
 const rate=10; document.getElementById('rate').textContent=rate.toFixed(2)+' DCX/H';
