@@ -511,6 +511,7 @@ async function claimReferral() {
     const result = await referralRequest('register');
 
     message.textContent = result.message || 'Registration completed.';
+    await loadReferral();
   } catch (error) {
     message.textContent = error.message;
   }
