@@ -345,9 +345,9 @@ render();
 setInterval(()=>{
   if(active){
     const elapsed=(Date.now()-rewardSnapshotAt)/1000;
-    const currentReward=pendingReward+(elapsed*rate/3600);
-    document.getElementById('earned').textContent=
-      currentReward.toFixed(4)+' DCX';
+    const currentReward=Math.min(240,pendingReward+(elapsed*rate/3600));
+document.getElementById('earned').textContent=
+  currentReward.toFixed(4)+' DCX';
   }
 },1000);
 
