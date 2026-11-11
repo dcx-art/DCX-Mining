@@ -504,13 +504,15 @@ async function claimReferral() {
 }
 
 (async function() {
-  try {
-    await referralRequest('register');
-  } catch (error) {
-    console.log('Referral registration:', error.message);
-  }
+  const message = document.getElementById('refMessage');
 
-  await loadReferral();
+  try {
+    const result = await referralRequest('register');
+
+    message.textContent = result.message || 'Registration completed.';
+  } catch (error) {
+    message.textContent = error.message;
+  }
 })();
   
 </script>
