@@ -503,7 +503,16 @@ async function claimReferral() {
   }
 }
 
-loadReferral();
+(async function() {
+  try {
+    await referralRequest('register');
+  } catch (error) {
+    console.log('Referral registration:', error.message);
+  }
+
+  await loadReferral();
+})();
+  
 </script>
   
 </body>
