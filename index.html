@@ -289,7 +289,7 @@ function render(){
   document.getElementById('status').textContent=active?'Aktif':'Tidak aktif';
   document.getElementById('orb').classList.toggle('active',active);
   document.getElementById('mineBtn').textContent=active?'CLAIM DCX':'START MINING';
-  document.getElementById('earned').textContent=pendingReward.toFixed(4)+' DCX';
+  document.getElementById('earned').textContent=Math.min(240,pendingReward).toFixed(4)+' DCX';
   document.getElementById('timer').textContent=active?'Mining Active Since'+new Date(startAt).toLocaleString('id-ID'):'Mining Not Started';
 }
 
