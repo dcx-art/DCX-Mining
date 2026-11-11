@@ -351,7 +351,7 @@ setInterval(()=>{
 },1000);
 
 refreshMining().catch(error=>{
-  document.getElementById('timer').textContent=error.message||'Gagal memuat mining';
+  document.getElementById('timer').textContent='';
 });
 </script>
 <script>
