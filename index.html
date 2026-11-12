@@ -719,7 +719,7 @@ async function loadLevelRules() {
       const isCurrent = Number(rule.level) === currentLevel;
       return '<div class="level level-rule' + (isCurrent ? ' current' : '') + '">' +
         '<div class="level-details"><div class="level-name">LEVEL ' + Number(rule.level) + (isCurrent ? ' · YOUR LEVEL' : '') + '</div>' +
-        '<div class="small">Required holding: ' + formatDcx(rule.holding_required_dcx) + ' DCX</div></div>' +
+        '<div class="small">' + (Number(rule.level) === 1 ? 'Free' : 'Required holding: ' + formatDcx(rule.holding_required_dcx) + ' DCX') + '</div></div>' +
         '<div class="level-reward"><b>' + formatDcx(total) + ' DCX/day</b>' +
         '<div class="small">Base ' + formatDcx(base) + (bonus > 0 ? ' + Bonus ' + formatDcx(bonus) : '') + '</div></div></div>';
     }).join('');
