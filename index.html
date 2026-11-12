@@ -422,7 +422,7 @@ if(connectionStatus){
 }
 function tab(id,btn){document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));document.getElementById(id).classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();}
 function copyRef(){navigator.clipboard?.writeText(document.getElementById('refLink').value).then(()=>alert('Link disalin')); }
-function setMaxWithdraw(){document.getElementById("amount").value=Number(balance).toFixed(9);document.getElementById("wdmsg").textContent="Maximum available balance filled.";}
+function setMaxWithdraw(){document.getElementById("amount").value=Math.floor(Number(balance)||0);document.getElementById("wdmsg").textContent="Maximum available whole-number balance filled."; }
 function withdraw(){const a=Number(document.getElementById('amount').value);const msg=document.getElementById('wdmsg');if(!a||a<10000){msg.textContent='Minimum withdrawal is 10,000 DCX.';return;}if(a>balance){msg.textContent='Your available DCX balance is insufficient.';return;}msg.textContent='Withdrawal requests are not enabled yet. No request has been submitted.';}
 render();
 
