@@ -242,9 +242,9 @@ margin-top:12px;
     <div class="row"><b>Wallet Status</b><b id="walletVerifyStatus">Checking...</b></div>
     <div class="small" id="walletAddressText">No wallet connected yet.</div>
   </div>
-  <label class="label" for="walletAddressInput">TON Wallet Address</label>
-  <input id="walletAddressInput" placeholder="Paste your TON wallet address">
+  <div id="tonConnectMount" style="display:none"></div>
   <button id="connectWalletBtn" onclick="connectWallet()">CONNECT WALLET</button>
+  <p class="small">Choose Tonkeeper or Telegram Wallet in the secure TON Connect wallet selector. Your wallet address will be added automatically after you approve the connection.</p>
   <p class="small" id="walletStatusMessage">Connect your TON wallet address to continue.</p>
   <div id="walletPaymentPanel" style="display:none">
     <div class="notice">Wallet verification costs 0.07 TON on TON Mainnet. This fee is non-refundable. TON network fees may be additional. Only continue if you agree.</div>
@@ -587,8 +587,12 @@ async function claimReferral() {
 </script>
   
 
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 <script>
 const WALLET_API = 'https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/wallet-api';
+const TONCONNECT_MANIFEST = 'https://dcx-art.github.io/DCX-Mining/tonconnect-manifest.json';
+const TELEGRAM_RETURN_URL = 'https://t.me/dcxmining_bot/DCXMining';
+let tonConnectUI = null;
 
 let activeWalletPaymentId = null;
 
@@ -610,19 +614,51 @@ async function walletRequest(action, extra = {}) {
 }
 
 async function connectWallet() {
-  const button = document.getElementById('connectWalletBtn');
   const message = document.getElementById('walletStatusMessage');
-  const walletAddress = document.getElementById('walletAddressInput').value.trim();
-  if (!walletAddress) { message.textContent = 'Please paste your public TON wallet address.'; return; }
-  button.disabled = true;
-  message.textContent = 'Connecting wallet...';
+  if (!tonConnectUI) {
+    message.textContent = 'Wallet selector is still loading. Please try again in a moment.';
+    return;
+  }
   try {
-    await walletRequest('connect_wallet', { walletAddress });
-    message.textContent = 'Wallet address connected. Continue with verification below.';
+    message.textContent = 'Choose Tonkeeper or Telegram Wallet to connect.';
+    await tonConnectUI.openModal();
+  } catch (error) {
+    message.textContent = error?.message || 'Unable to open the TON wallet selector.';
+  }
+}
+
+async function initializeTonConnect() {
+  const message = document.getElementById('walletStatusMessage');
+  try {
+    if (!window.TON_CONNECT_UI?.TonConnectUI) {
+      throw new Error('TON Connect could not be loaded. Please refresh the app.');
+    }
+    tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: TONCONNECT_MANIFEST
+    });
+    tonConnectUI.uiOptions = {
+      actionsConfiguration: { twaReturnUrl: TELEGRAM_RETURN_URL }
+    };
+    tonConnectUI.onStatusChange(async wallet => {
+      if (!wallet?.account?.address) return;
+      const button = document.getElementById('connectWalletBtn');
+      button.disabled = true;
+      message.textContent = 'Wallet connected. Saving your wallet address securely...';
+      try {
+        await walletRequest('connect_wallet', { walletAddress: wallet.account.address });
+        await loadWalletStatus();
+        message.textContent = 'Wallet connected successfully. Please continue to verification.';
+      } catch (error) {
+        message.textContent = error.message || 'Wallet connected, but saving the address failed.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+    await tonConnectUI.connectionRestored;
     await loadWalletStatus();
   } catch (error) {
-    message.textContent = error.message || 'Unable to connect wallet.';
-  } finally { button.disabled = false; }
+    message.textContent = error?.message || 'TON Connect initialization failed.';
+  }
 }
 
 async function beginWalletVerification() {
@@ -678,7 +714,6 @@ async function loadWalletStatus() {
     document.getElementById('walletLevel').textContent = 'Level ' + Number(result.level || 1);
     document.getElementById('walletHolding').textContent = Number(result.wallet_balance_dcx || 0).toLocaleString('en-US') + ' DCX';
     document.getElementById('walletCheckedAt').textContent = result.wallet_balance_checked_at ? 'Last checked: ' + new Date(result.wallet_balance_checked_at).toLocaleString() : 'DCX holding has not been checked yet.';
-    document.getElementById('walletAddressInput').value = result.wallet_address || '';
     document.getElementById('walletPaymentPanel').style.display = result.wallet_address && !result.wallet_verified ? 'block' : 'none';
     document.getElementById('beginWalletVerificationBtn').style.display = result.wallet_verified ? 'none' : 'block';
     if (result.wallet_verified) message.textContent = 'Wallet verified successfully.';
@@ -691,7 +726,7 @@ async function loadWalletStatus() {
   } finally { button.disabled = false; }
 }
 
-loadWalletStatus();
+initializeTonConnect();
 </script>
 
 </body>
