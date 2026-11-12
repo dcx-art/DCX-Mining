@@ -1051,6 +1051,22 @@ async function dcxLoadWithdrawals() {
         processing.onclick = () => dcxAdminUpdateRequest('admin_processing', request.id);
         actions.append(processing);
       }
+      if (request.status === 'processing') {
+        const hashInput = document.createElement('input');
+        hashInput.type = 'text';
+        hashInput.id = 'dcxTxHash_' + request.id;
+        hashInput.maxLength = 64;
+        hashInput.autocomplete = 'off';
+        hashInput.spellcheck = false;
+        hashInput.placeholder = 'Paste TON transaction hash (64 hex characters)';
+        hashInput.style.marginTop = '12px';
+        card.append(hashInput);
+        const complete = document.createElement('button');
+        complete.textContent = 'VERIFY & COMPLETE';
+        complete.style.marginTop = '7px';
+        complete.onclick = () => dcxAdminCompleteRequest(request.id, hashInput.id);
+        card.append(complete);
+      }
       const reject = document.createElement('button');
       reject.className = 'secondary';
       reject.textContent = 'REJECT & REFUND';
@@ -1063,6 +1079,29 @@ async function dcxLoadWithdrawals() {
     message.textContent = error.message || 'Unable to load withdrawal requests.';
   } finally {
     button.disabled = false;
+  }
+}
+
+async function dcxAdminCompleteRequest(requestId, inputId) {
+  const input = document.getElementById(inputId);
+  const transactionHash = String(input?.value || '').trim();
+  if (!/^[0-9a-fA-F]{64}$/.test(transactionHash)) {
+    document.getElementById('dcxWithdrawalsMessage').textContent =
+      'Enter the 64-character TON transaction hash from the confirmed DCX transfer.';
+    return;
+  }
+  if (!confirm('Verify this TON DCX transfer and mark withdrawal request #' + requestId + ' as COMPLETED?')) return;
+  const message = document.getElementById('dcxWithdrawalsMessage');
+  message.textContent = 'Checking the transaction on TON Mainnet...';
+  try {
+    const result = await dcxWithdrawApi('admin_complete', { requestId, transactionHash });
+    if (!result.success || result.status !== 'completed') {
+      throw new Error(result.error || 'The withdrawal was not completed.');
+    }
+    message.textContent = 'Request #' + requestId + ' verified and marked COMPLETED.';
+    await dcxLoadWithdrawals();
+  } catch (error) {
+    message.textContent = error.message || 'Unable to verify this TON transaction.';
   }
 }
 
