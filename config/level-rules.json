@@ -12,7 +12,8 @@
   "level_100_bonus": {
     "enabled": true,
     "minimum_holding_dcx": 1000000,
-    "bonus_dcx_per_day": 2000,
+    "base_reward_dcx_per_day": 5000,
+    "bonus_reward_dcx_per_day": 2000,
     "total_reward_dcx_per_day": 7000,
     "active_only_while_holding_requirement_is_met": true
   },
@@ -90,602 +91,711 @@
     {
       "level": 1,
       "holding_dcx": 0,
-      "reward_dcx_per_day": 100,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 100,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 100
     },
     {
       "level": 2,
       "holding_dcx": 500,
-      "reward_dcx_per_day": 200,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 200,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 200
     },
     {
       "level": 3,
       "holding_dcx": 700,
-      "reward_dcx_per_day": 229,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 229,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 229
     },
     {
       "level": 4,
       "holding_dcx": 900,
-      "reward_dcx_per_day": 257,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 257,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 257
     },
     {
       "level": 5,
       "holding_dcx": 1100,
-      "reward_dcx_per_day": 286,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 286,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 286
     },
     {
       "level": 6,
       "holding_dcx": 1300,
-      "reward_dcx_per_day": 314,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 314,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 314
     },
     {
       "level": 7,
       "holding_dcx": 1400,
-      "reward_dcx_per_day": 343,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 343,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 343
     },
     {
       "level": 8,
       "holding_dcx": 1600,
-      "reward_dcx_per_day": 371,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 371,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 371
     },
     {
       "level": 9,
       "holding_dcx": 1800,
-      "reward_dcx_per_day": 400,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 400,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 400
     },
     {
       "level": 10,
       "holding_dcx": 2000,
-      "reward_dcx_per_day": 429,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 429,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 429
     },
     {
       "level": 11,
       "holding_dcx": 2300,
-      "reward_dcx_per_day": 457,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 457,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 457
     },
     {
       "level": 12,
       "holding_dcx": 2600,
-      "reward_dcx_per_day": 486,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 486,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 486
     },
     {
       "level": 13,
       "holding_dcx": 2900,
-      "reward_dcx_per_day": 514,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 514,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 514
     },
     {
       "level": 14,
       "holding_dcx": 3200,
-      "reward_dcx_per_day": 543,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 543,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 543
     },
     {
       "level": 15,
       "holding_dcx": 3500,
-      "reward_dcx_per_day": 571,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 571,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 571
     },
     {
       "level": 16,
       "holding_dcx": 3800,
-      "reward_dcx_per_day": 600,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 600,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 600
     },
     {
       "level": 17,
       "holding_dcx": 4100,
-      "reward_dcx_per_day": 629,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 629,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 629
     },
     {
       "level": 18,
       "holding_dcx": 4400,
-      "reward_dcx_per_day": 657,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 657,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 657
     },
     {
       "level": 19,
       "holding_dcx": 4700,
-      "reward_dcx_per_day": 686,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 686,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 686
     },
     {
       "level": 20,
       "holding_dcx": 5000,
-      "reward_dcx_per_day": 714,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 714,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 714
     },
     {
       "level": 21,
       "holding_dcx": 5700,
-      "reward_dcx_per_day": 743,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 743,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 743
     },
     {
       "level": 22,
       "holding_dcx": 6400,
-      "reward_dcx_per_day": 771,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 771,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 771
     },
     {
       "level": 23,
       "holding_dcx": 7100,
-      "reward_dcx_per_day": 800,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 800,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 800
     },
     {
       "level": 24,
       "holding_dcx": 7800,
-      "reward_dcx_per_day": 829,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 829,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 829
     },
     {
       "level": 25,
       "holding_dcx": 8500,
-      "reward_dcx_per_day": 857,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 857,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 857
     },
     {
       "level": 26,
       "holding_dcx": 9200,
-      "reward_dcx_per_day": 886,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 886,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 886
     },
     {
       "level": 27,
       "holding_dcx": 9900,
-      "reward_dcx_per_day": 914,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 914,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 914
     },
     {
       "level": 28,
       "holding_dcx": 10600,
-      "reward_dcx_per_day": 943,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 943,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 943
     },
     {
       "level": 29,
       "holding_dcx": 11300,
-      "reward_dcx_per_day": 971,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 971,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 971
     },
     {
       "level": 30,
       "holding_dcx": 12000,
-      "reward_dcx_per_day": 1000,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1000,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1000
     },
     {
       "level": 31,
       "holding_dcx": 15200,
-      "reward_dcx_per_day": 1050,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1050,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1050
     },
     {
       "level": 32,
       "holding_dcx": 18300,
-      "reward_dcx_per_day": 1100,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1100,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1100
     },
     {
       "level": 33,
       "holding_dcx": 21500,
-      "reward_dcx_per_day": 1150,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1150,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1150
     },
     {
       "level": 34,
       "holding_dcx": 24600,
-      "reward_dcx_per_day": 1200,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1200,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1200
     },
     {
       "level": 35,
       "holding_dcx": 27800,
-      "reward_dcx_per_day": 1250,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1250,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1250
     },
     {
       "level": 36,
       "holding_dcx": 30900,
-      "reward_dcx_per_day": 1300,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1300,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1300
     },
     {
       "level": 37,
       "holding_dcx": 34100,
-      "reward_dcx_per_day": 1350,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1350,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1350
     },
     {
       "level": 38,
       "holding_dcx": 37200,
-      "reward_dcx_per_day": 1400,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1400,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1400
     },
     {
       "level": 39,
       "holding_dcx": 40400,
-      "reward_dcx_per_day": 1450,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1450,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1450
     },
     {
       "level": 40,
       "holding_dcx": 43500,
-      "reward_dcx_per_day": 1500,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1500,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1500
     },
     {
       "level": 41,
       "holding_dcx": 46700,
-      "reward_dcx_per_day": 1550,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1550,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1550
     },
     {
       "level": 42,
       "holding_dcx": 49800,
-      "reward_dcx_per_day": 1600,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1600,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1600
     },
     {
       "level": 43,
       "holding_dcx": 53000,
-      "reward_dcx_per_day": 1650,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1650,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1650
     },
     {
       "level": 44,
       "holding_dcx": 56100,
-      "reward_dcx_per_day": 1700,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1700,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1700
     },
     {
       "level": 45,
       "holding_dcx": 59300,
-      "reward_dcx_per_day": 1750,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1750,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1750
     },
     {
       "level": 46,
       "holding_dcx": 62400,
-      "reward_dcx_per_day": 1800,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1800,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1800
     },
     {
       "level": 47,
       "holding_dcx": 65600,
-      "reward_dcx_per_day": 1850,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1850,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1850
     },
     {
       "level": 48,
       "holding_dcx": 68700,
-      "reward_dcx_per_day": 1900,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1900,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1900
     },
     {
       "level": 49,
       "holding_dcx": 71900,
-      "reward_dcx_per_day": 1950,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 1950,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 1950
     },
     {
       "level": 50,
       "holding_dcx": 75000,
-      "reward_dcx_per_day": 2000,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2000,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2000
     },
     {
       "level": 51,
       "holding_dcx": 86600,
-      "reward_dcx_per_day": 2040,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2040,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2040
     },
     {
       "level": 52,
       "holding_dcx": 98200,
-      "reward_dcx_per_day": 2080,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2080,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2080
     },
     {
       "level": 53,
       "holding_dcx": 109800,
-      "reward_dcx_per_day": 2120,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2120,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2120
     },
     {
       "level": 54,
       "holding_dcx": 121400,
-      "reward_dcx_per_day": 2160,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2160,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2160
     },
     {
       "level": 55,
       "holding_dcx": 133000,
-      "reward_dcx_per_day": 2200,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2200,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2200
     },
     {
       "level": 56,
       "holding_dcx": 144600,
-      "reward_dcx_per_day": 2240,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2240,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2240
     },
     {
       "level": 57,
       "holding_dcx": 156200,
-      "reward_dcx_per_day": 2280,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2280,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2280
     },
     {
       "level": 58,
       "holding_dcx": 167800,
-      "reward_dcx_per_day": 2320,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2320,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2320
     },
     {
       "level": 59,
       "holding_dcx": 179400,
-      "reward_dcx_per_day": 2360,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2360,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2360
     },
     {
       "level": 60,
       "holding_dcx": 191000,
-      "reward_dcx_per_day": 2400,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2400,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2400
     },
     {
       "level": 61,
       "holding_dcx": 202600,
-      "reward_dcx_per_day": 2440,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2440,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2440
     },
     {
       "level": 62,
       "holding_dcx": 214200,
-      "reward_dcx_per_day": 2480,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2480,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2480
     },
     {
       "level": 63,
       "holding_dcx": 225800,
-      "reward_dcx_per_day": 2520,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2520,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2520
     },
     {
       "level": 64,
       "holding_dcx": 237400,
-      "reward_dcx_per_day": 2560,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2560,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2560
     },
     {
       "level": 65,
       "holding_dcx": 249000,
-      "reward_dcx_per_day": 2600,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2600,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2600
     },
     {
       "level": 66,
       "holding_dcx": 260600,
-      "reward_dcx_per_day": 2640,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2640,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2640
     },
     {
       "level": 67,
       "holding_dcx": 272200,
-      "reward_dcx_per_day": 2680,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2680,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2680
     },
     {
       "level": 68,
       "holding_dcx": 283800,
-      "reward_dcx_per_day": 2720,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2720,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2720
     },
     {
       "level": 69,
       "holding_dcx": 295400,
-      "reward_dcx_per_day": 2760,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2760,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2760
     },
     {
       "level": 70,
       "holding_dcx": 307000,
-      "reward_dcx_per_day": 2800,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2800,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2800
     },
     {
       "level": 71,
       "holding_dcx": 318600,
-      "reward_dcx_per_day": 2840,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2840,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2840
     },
     {
       "level": 72,
       "holding_dcx": 330200,
-      "reward_dcx_per_day": 2880,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2880,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2880
     },
     {
       "level": 73,
       "holding_dcx": 341800,
-      "reward_dcx_per_day": 2920,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2920,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2920
     },
     {
       "level": 74,
       "holding_dcx": 353400,
-      "reward_dcx_per_day": 2960,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 2960,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 2960
     },
     {
       "level": 75,
       "holding_dcx": 365000,
-      "reward_dcx_per_day": 3000,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3000,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3000
     },
     {
       "level": 76,
       "holding_dcx": 390400,
-      "reward_dcx_per_day": 3080,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3080,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3080
     },
     {
       "level": 77,
       "holding_dcx": 415800,
-      "reward_dcx_per_day": 3160,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3160,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3160
     },
     {
       "level": 78,
       "holding_dcx": 441200,
-      "reward_dcx_per_day": 3240,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3240,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3240
     },
     {
       "level": 79,
       "holding_dcx": 466600,
-      "reward_dcx_per_day": 3320,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3320,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3320
     },
     {
       "level": 80,
       "holding_dcx": 492000,
-      "reward_dcx_per_day": 3400,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3400,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3400
     },
     {
       "level": 81,
       "holding_dcx": 517400,
-      "reward_dcx_per_day": 3480,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3480,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3480
     },
     {
       "level": 82,
       "holding_dcx": 542800,
-      "reward_dcx_per_day": 3560,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3560,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3560
     },
     {
       "level": 83,
       "holding_dcx": 568200,
-      "reward_dcx_per_day": 3640,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3640,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3640
     },
     {
       "level": 84,
       "holding_dcx": 593600,
-      "reward_dcx_per_day": 3720,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3720,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3720
     },
     {
       "level": 85,
       "holding_dcx": 619000,
-      "reward_dcx_per_day": 3800,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3800,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3800
     },
     {
       "level": 86,
       "holding_dcx": 644400,
-      "reward_dcx_per_day": 3880,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3880,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3880
     },
     {
       "level": 87,
       "holding_dcx": 669800,
-      "reward_dcx_per_day": 3960,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 3960,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 3960
     },
     {
       "level": 88,
       "holding_dcx": 695200,
-      "reward_dcx_per_day": 4040,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4040,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4040
     },
     {
       "level": 89,
       "holding_dcx": 720600,
-      "reward_dcx_per_day": 4120,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4120,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4120
     },
     {
       "level": 90,
       "holding_dcx": 746000,
-      "reward_dcx_per_day": 4200,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4200,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4200
     },
     {
       "level": 91,
       "holding_dcx": 771400,
-      "reward_dcx_per_day": 4280,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4280,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4280
     },
     {
       "level": 92,
       "holding_dcx": 796800,
-      "reward_dcx_per_day": 4360,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4360,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4360
     },
     {
       "level": 93,
       "holding_dcx": 822200,
-      "reward_dcx_per_day": 4440,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4440,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4440
     },
     {
       "level": 94,
       "holding_dcx": 847600,
-      "reward_dcx_per_day": 4520,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4520,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4520
     },
     {
       "level": 95,
       "holding_dcx": 873000,
-      "reward_dcx_per_day": 4600,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4600,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4600
     },
     {
       "level": 96,
       "holding_dcx": 898400,
-      "reward_dcx_per_day": 4680,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4680,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4680
     },
     {
       "level": 97,
       "holding_dcx": 923800,
-      "reward_dcx_per_day": 4760,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4760,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4760
     },
     {
       "level": 98,
       "holding_dcx": 949200,
-      "reward_dcx_per_day": 4840,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4840,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4840
     },
     {
       "level": 99,
       "holding_dcx": 974600,
-      "reward_dcx_per_day": 4920,
-      "level_100_bonus_dcx_per_day": 0
+      "base_reward_dcx_per_day": 4920,
+      "bonus_reward_dcx_per_day": 0,
+      "total_reward_dcx_per_day": 4920
     },
     {
       "level": 100,
       "holding_dcx": 1000000,
-      "reward_dcx_per_day": 7000,
-      "level_100_bonus_dcx_per_day": 2000
+      "base_reward_dcx_per_day": 5000,
+      "bonus_reward_dcx_per_day": 2000,
+      "total_reward_dcx_per_day": 7000
     }
-  ]
+  ],
+  "wallet_verification": {
+    "required_before_mining": true,
+    "network": "TON mainnet",
+    "official_receiver_address": "UQDZJan6ICt2fXxKzPxjGFA-ztTb6mvLtmbEnwoeGn5UH_JN",
+    "fee_ton": "0.07",
+    "fee_nano_ton": "70000000",
+    "refundable": false,
+    "mark_verified_only_after_onchain_transaction_validation": true
+  }
 }
