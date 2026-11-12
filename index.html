@@ -712,7 +712,7 @@ async function initializeTonConnect() {
       try {
         await walletRequest('connect_wallet', { walletAddress: wallet.account.address });
         await loadWalletStatus();
-        message.textContent = 'Wallet connected successfully. Please continue to verification.';
+        // Keep the authoritative message set by loadWalletStatus; verified wallets need no further verification prompt.
       } catch (error) {
         message.textContent = error.message || 'Wallet connected, but saving the address failed.';
       } finally {
