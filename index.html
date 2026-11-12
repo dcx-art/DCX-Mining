@@ -225,6 +225,41 @@ margin-top:12px;
 .tabs{gap:4px}
 .tabs button{font-size:10px;padding:11px 2px}
 }
+
+/* Compact mining screen for mobile */
+@media(max-width:520px){
+  body{padding:7px 9px 14px}
+  .top{margin:3px 0 7px}
+  .brand{font-size:19px}
+  .pill{padding:5px 9px;font-size:10px}
+  .tabs{margin:7px 0;gap:5px}
+  .tabs button{padding:8px 2px;font-size:10px}
+  .wallet-card{padding:10px 11px;margin:6px 0;border-radius:14px}
+  .wallet-card h3{font-size:15px;margin:0 0 6px}
+  .wallet-card .level{padding:7px 9px;margin:5px 0}
+  .wallet-card .row{margin:3px 0;gap:6px;font-size:12px}
+  #walletAddressText{margin-top:5px;padding:6px 8px;font-size:10px;line-height:1.35}
+  .wallet-card #connectWalletBtn,
+  .wallet-card #refreshWalletStatusBtn,
+  .wallet-card #beginWalletVerificationBtn{padding:9px 10px;font-size:12px;border-radius:9px;margin:4px 0}
+  .wallet-card p.small{font-size:10px;line-height:1.3;margin:4px 0}
+  .wallet-card p.small:not(#walletStatusMessage):not(#walletCheckedAt){display:none}
+  .wallet-card #walletCheckedAt{display:none}
+  .wallet-card .stats{gap:6px;margin-top:5px!important}
+  .wallet-card .stat{padding:6px 8px;border-radius:9px}
+  .wallet-card .stat .label{font-size:9px}
+  .wallet-card .stat b{font-size:13px;margin-top:2px}
+  .wallet-card .notice{font-size:10px;line-height:1.3;padding:6px 8px;margin-top:5px}
+  .wallet-card #walletPaymentPanel .notice{font-size:10px}
+  .mining-compact{padding:9px 11px;margin:6px 0;border-radius:14px}
+  .mining-compact .orb{width:76px;height:76px;margin:2px auto 5px}
+  .mining-compact .dcx-logo{width:72px;height:72px}
+  .mining-compact .label{font-size:10px}
+  .mining-compact h2{font-size:19px;margin:3px 0}
+  .mining-compact #mineBtn{padding:10px;font-size:13px;margin-top:4px}
+  .mining-compact .small{font-size:10px;line-height:1.3}
+}
+
 </style>
 <style>
 #prototypeNotice,
@@ -256,7 +291,7 @@ margin-top:12px;
 </div>
 <div class="tabs"><button class="active" onclick="tab('mine',this)">⛏ Mining</button><button class="secondary" onclick="tab('ref',this)">♧ Referral</button><button class="secondary" onclick="tab('level',this)">⚡ Level</button><button class="secondary" onclick="tab('wd',this)">↗ Withdraw</button></div>
 <section id="mine" class="section show">
-<div class="card">
+<div class="card wallet-card">
   <h3>Wallet Connection & Verification</h3>
   <div class="level current">
     <div class="row"><b>Wallet Status</b><b id="walletVerifyStatus">Checking...</b></div>
@@ -288,7 +323,7 @@ margin-top:12px;
   <button class="secondary" id="refreshWalletStatusBtn" onclick="loadWalletStatus()">REFRESH WALLET STATUS</button>
   <div class="notice">NO VERIFIED WALLET, NO MINING. Mining access will be enabled only after wallet verification succeeds.</div>
 </div>
-<div class="card mining"><div class="orb" id="orb">
+<div class="card mining mining-compact"><div class="orb" id="orb">
   <img src="https://dcx-art.github.io/DCX-Mining/dcx-coin.png?v=2"
        class="dcx-logo" alt="DCX Coin">
 </div><div class="label">Mining session</div><h2 id="earned">0.0000 DCX</h2><div class="small" id="timer">Mining belum dimulai</div><div style="margin-top:15px"><button id="mineBtn" onclick="toggleMine()">MULAI MINING</button></div></div></section>
