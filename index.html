@@ -642,7 +642,7 @@ function startWalletPaymentAutoCheck() {
   if (walletPaymentPollTimer) clearInterval(walletPaymentPollTimer);
   walletPaymentPollTimer = setInterval(() => {
     if (document.visibilityState === 'visible') verifyWalletPayment(true);
-  }, 15000);
+  }, 5000);
 }
 function restoreWalletPayment() {
   try {
@@ -721,7 +721,6 @@ async function initializeTonConnect() {
     });
     await tonConnectUI.connectionRestored;
     await loadWalletStatus();
-    restoreWalletPayment();
   } catch (error) {
     message.textContent = error?.message || 'TON Connect initialization failed.';
   }
@@ -783,17 +782,8 @@ async function verifyWalletPayment(silent = false) {
   walletPaymentCheckBusy = true;
   if (button && !silent) button.disabled = true;
   try {
-    // Always read the authoritative account status first. If the backend has
-    // already confirmed payment, never keep scanning the chain or show stale pending text.
-    const accountStatus = await walletRequest('status');
-    if (accountStatus.wallet_verified) {
-      clearWalletPayment();
-      document.getElementById('walletStatusMessage').textContent = 'Wallet verified successfully.';
-      document.getElementById('walletPaymentPanel').style.display = 'none';
-      document.getElementById('walletPaymentDetails').style.display = 'none';
-      await loadWalletStatus();
-      return;
-    }
+    // verify_payment checks the authoritative account status and payment row server-side.
+    // One request per poll reduces latency and unnecessary API traffic.
     const result = await walletRequest('verify_payment', { paymentId: activeWalletPaymentId });
     if (result.wallet_verified) {
       clearWalletPayment();
@@ -878,6 +868,7 @@ async function loadWalletStatus() {
         startWalletPaymentAutoCheck();
         verifyWalletPayment(true);
       } else {
+        clearWalletPayment();
         document.getElementById('walletPaymentDetails').style.display = 'none';
         message.textContent = 'Wallet connected. Complete the verification step below.';
       }
