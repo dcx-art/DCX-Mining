@@ -961,7 +961,7 @@ initializeTonConnect();
 <script>
 const DCX_WITHDRAW_API = 'https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/withdraw-api';
 
-async function dcxWithdrawApi(action) {
+async function dcxWithdrawApi(action, extra = {}) {
   if (!window.Telegram?.WebApp?.initData) {
     throw new Error('Please open DCX Mining through Telegram.');
   }
@@ -974,7 +974,7 @@ async function dcxWithdrawApi(action) {
     body: JSON.stringify({
       action,
       initData: window.Telegram.WebApp.initData,
-      ...(arguments[1] || {})
+      ...extra
     })
   });
   const result = await response.json();
@@ -989,6 +989,7 @@ async function dcxLoadAdminTools() {
     const result = await dcxWithdrawApi('admin_check');
     if (result.is_admin) {
       document.getElementById('dcxAdminTestPanel').style.display = 'block';
+      await dcxLoadWithdrawals();
     }
   } catch (_) {
     // Non-admin users do not see the admin-only panel.
