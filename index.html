@@ -850,9 +850,30 @@ async function loadWalletStatus() {
     document.getElementById('walletCheckedAt').textContent = result.wallet_balance_checked_at ? 'Last checked: ' + new Date(result.wallet_balance_checked_at).toLocaleString() : 'DCX holding has not been checked yet.';
     document.getElementById('walletPaymentPanel').style.display = result.wallet_address && !result.wallet_verified ? 'block' : 'none';
     document.getElementById('beginWalletVerificationBtn').style.display = result.wallet_verified ? 'none' : 'block';
-    if (result.wallet_verified) message.textContent = 'Wallet verified successfully.';
-    else if (result.wallet_address) message.textContent = 'Wallet connected. Complete the verification step below.';
-    else message.textContent = 'Connect your TON wallet address to continue.';
+    if (result.wallet_verified) {
+      message.textContent = 'Wallet verified successfully.';
+      document.getElementById('walletPaymentDetails').style.display = 'none';
+      clearWalletPayment();
+    } else if (result.wallet_address) {
+      message.textContent = 'Wallet connected. Checking for your previous verification payment...';
+      const pending = await walletRequest('pending_verification');
+      if (pending.pending) {
+        activeWalletPaymentId = pending.payment_id;
+        saveWalletPayment({ paymentId: pending.payment_id, expiresAt: pending.expires_at });
+        document.getElementById('walletPaymentExpiry').textContent = 'Existing payment request: ' + new Date(pending.expires_at).toLocaleString();
+        document.getElementById('walletPaymentDetails').style.display = 'block';
+        document.getElementById('beginWalletVerificationBtn').style.display = 'none';
+        message.textContent = 'Your previous 0.07 TON payment request was found. DCX is checking that transaction now. Do not pay again.';
+        startWalletPaymentAutoCheck();
+        verifyWalletPayment(true);
+      } else {
+        document.getElementById('walletPaymentDetails').style.display = 'none';
+        message.textContent = 'Wallet connected. Complete the verification step below.';
+      }
+    } else {
+      document.getElementById('walletPaymentDetails').style.display = 'none';
+      message.textContent = 'Connect your TON wallet address to continue.';
+    }
   } catch (error) {
     message.textContent = error.message || 'Unable to load wallet status.';
     document.getElementById('walletVerifyStatus').textContent = 'UNAVAILABLE';
