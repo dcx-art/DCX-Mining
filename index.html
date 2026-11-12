@@ -234,30 +234,7 @@ margin-top:12px;
   .pill{padding:5px 9px;font-size:10px}
   .tabs{margin:7px 0;gap:5px}
   .tabs button{padding:8px 2px;font-size:10px}
-  .wallet-card{padding:10px 11px;margin:6px 0;border-radius:14px}
-  .wallet-card h3{font-size:15px;margin:0 0 6px}
-  .wallet-card .level{padding:7px 9px;margin:5px 0}
-  .wallet-card .row{margin:3px 0;gap:6px;font-size:12px}
   #walletAddressText{margin-top:5px;padding:6px 8px;font-size:10px;line-height:1.35}
-  .wallet-card #connectWalletBtn,
-  .wallet-card #refreshWalletStatusBtn,
-  .wallet-card #beginWalletVerificationBtn{padding:9px 10px;font-size:12px;border-radius:9px;margin:4px 0}
-  .wallet-card p.small{font-size:10px;line-height:1.3;margin:4px 0}
-  .wallet-card .wallet-help{display:none}
-  .wallet-card #walletCheckedAt{display:none}
-  .wallet-card .stats{gap:6px;margin-top:5px!important}
-  .wallet-card .stat{padding:6px 8px;border-radius:9px}
-  .wallet-card .stat .label{font-size:9px}
-  .wallet-card .stat b{font-size:13px;margin-top:2px}
-  .wallet-card .notice{font-size:10px;line-height:1.3;padding:6px 8px;margin-top:5px}
-  .wallet-card #walletPaymentPanel .notice{font-size:10px}
-  .mining-compact{padding:9px 11px;margin:6px 0;border-radius:14px}
-  .mining-compact .orb{width:76px;height:76px;margin:2px auto 5px}
-  .mining-compact .dcx-logo{width:72px;height:72px}
-  .mining-compact .label{font-size:10px}
-  .mining-compact h2{font-size:19px;margin:3px 0}
-  .mining-compact #mineBtn{padding:10px;font-size:13px;margin-top:4px}
-  .mining-compact .small{font-size:10px;line-height:1.3}
 }
 
 </style>
@@ -291,39 +268,7 @@ margin-top:12px;
 </div>
 <div class="tabs"><button class="active" onclick="tab('mine',this)">⛏ Mining</button><button class="secondary" onclick="tab('ref',this)">♧ Referral</button><button class="secondary" onclick="tab('level',this)">⚡ Level</button><button class="secondary" onclick="tab('wd',this)">↗ Withdraw</button></div>
 <section id="mine" class="section show">
-<div class="card wallet-card">
-  <h3>Wallet Connection & Verification</h3>
-  <div class="level current">
-    <div class="row"><b>Wallet Status</b><b id="walletVerifyStatus">Checking...</b></div>
-    <div class="small" id="walletAddressText">No wallet connected yet.</div>
-  </div>
-  <div id="tonConnectMount" style="display:none"></div>
-  <button id="connectWalletBtn" onclick="connectWallet()">CONNECT WALLET</button>
-  <p class="small wallet-help">Choose Tonkeeper or Telegram Wallet in the secure TON Connect wallet selector. Your wallet address will be added automatically after you approve the connection.</p>
-  <p class="small" id="walletStatusMessage">Connect your TON wallet address to continue.</p>
-  <div id="walletPaymentPanel" style="display:none">
-    <div class="notice">Wallet verification costs 0.07 TON on TON Mainnet. This fee is non-refundable. TON network fees may be additional. Only continue if you agree.</div>
-    <button class="secondary" id="beginWalletVerificationBtn" onclick="beginWalletVerification()">CONTINUE TO VERIFICATION</button>
-    <div id="walletPaymentDetails" style="display:none">
-      <p class="small">Send exactly <b>0.07 TON</b> to this official DCX address:</p>
-      <input id="walletVerifyReceiver" readonly>
-      <button class="secondary" onclick="copyWalletField('walletVerifyReceiver')">COPY RECEIVER ADDRESS</button>
-      <p class="small">Payment comment (required):</p>
-      <input id="walletVerifyComment" readonly>
-      <button class="secondary" onclick="copyWalletField('walletVerifyComment')">COPY PAYMENT COMMENT</button>
-      <p class="small" id="walletPaymentExpiry"></p>
-      <button id="checkWalletPaymentBtn" onclick="verifyWalletPayment()">I HAVE PAID — CHECK PAYMENT</button>
-    </div>
-  </div>
-  <div class="stats" style="margin-top:14px">
-    <div class="stat"><div class="label">CURRENT LEVEL</div><b id="walletLevel">Level 1</b></div>
-    <div class="stat"><div class="label">DCX HOLDING</div><b id="walletHolding">0 DCX</b></div>
-  </div>
-  <p class="small" id="walletCheckedAt">DCX holding has not been checked yet.</p>
-  <button class="secondary" id="refreshWalletStatusBtn" onclick="loadWalletStatus()">REFRESH WALLET STATUS</button>
-  <div class="notice">NO VERIFIED WALLET, NO MINING. Mining access will be enabled only after wallet verification succeeds.</div>
-</div>
-<div class="card mining mining-compact"><div class="orb" id="orb">
+<div class="card mining"><div class="orb" id="orb">
   <img src="https://dcx-art.github.io/DCX-Mining/dcx-coin.png?v=2"
        class="dcx-logo" alt="DCX Coin">
 </div><div class="label">Mining session</div><h2 id="earned">0.0000 DCX</h2><div class="small" id="timer">Mining belum dimulai</div><div style="margin-top:15px"><button id="mineBtn" onclick="toggleMine()">MULAI MINING</button></div></div></section>
@@ -362,11 +307,44 @@ margin-top:12px;
 <section id="level" class="section">
   <div class="card">
     <h3>DCX Mining Levels</h3>
-    <p class="small">Connect and verify your TON wallet on the Mining page. Your eligible level and DCX holding will be displayed there.</p>
-    <button class="secondary" onclick="tab('mine',document.querySelector('.tabs button'))">GO TO MINING & WALLET</button>
+    <p class="small">Connect and verify your TON wallet on the Withdraw page. Your eligible level and DCX holding will be displayed there.</p>
+    <button class="secondary" onclick="tab('wd',document.querySelectorAll('.tabs button')[3])">GO TO WITHDRAW & WALLET</button>
   </div>
 </section>
-<section id="wd" class="section"><div class="card"><h3>Withdraw (simulasi)</h3><div class="small">Demo saja: permintaan tidak dikirim dan tidak ada pembayaran crypto.</div><label class="label">Alamat wallet</label><input id="wallet" placeholder="Masukkan alamat wallet"><label class="label">Jumlah DCX</label><input id="amount" type="number" min="10" placeholder="Minimal 10 DCX"><button onclick="withdraw()">Ajukan withdraw demo</button><p id="wdmsg" class="small"></p><div class="notice">Jangan gunakan seed phrase atau private key. Untuk withdraw sungguhan perlu backend, validasi saldo, dan integrasi wallet/pembayaran.</div></div></section>
+<section id="wd" class="section">
+<div class="card wallet-card">
+  <h3>Wallet Connection & Verification</h3>
+  <div class="level current">
+    <div class="row"><b>Wallet Status</b><b id="walletVerifyStatus">Checking...</b></div>
+    <div class="small" id="walletAddressText">No wallet connected yet.</div>
+  </div>
+  <div id="tonConnectMount" style="display:none"></div>
+  <button id="connectWalletBtn" onclick="connectWallet()">CONNECT WALLET</button>
+  <p class="small wallet-help">Choose Tonkeeper or Telegram Wallet in the secure TON Connect wallet selector. Your wallet address will be added automatically after you approve the connection.</p>
+  <p class="small" id="walletStatusMessage">Connect your TON wallet address to continue.</p>
+  <div id="walletPaymentPanel" style="display:none">
+    <div class="notice">Wallet verification costs 0.07 TON on TON Mainnet. This fee is non-refundable. TON network fees may be additional. Only continue if you agree.</div>
+    <button class="secondary" id="beginWalletVerificationBtn" onclick="beginWalletVerification()">CONTINUE TO VERIFICATION</button>
+    <div id="walletPaymentDetails" style="display:none">
+      <p class="small">Send exactly <b>0.07 TON</b> to this official DCX address:</p>
+      <input id="walletVerifyReceiver" readonly>
+      <button class="secondary" onclick="copyWalletField('walletVerifyReceiver')">COPY RECEIVER ADDRESS</button>
+      <p class="small">Payment comment (required):</p>
+      <input id="walletVerifyComment" readonly>
+      <button class="secondary" onclick="copyWalletField('walletVerifyComment')">COPY PAYMENT COMMENT</button>
+      <p class="small" id="walletPaymentExpiry"></p>
+      <button id="checkWalletPaymentBtn" onclick="verifyWalletPayment()">I HAVE PAID — CHECK PAYMENT</button>
+    </div>
+  </div>
+  <div class="stats" style="margin-top:14px">
+    <div class="stat"><div class="label">CURRENT LEVEL</div><b id="walletLevel">Level 1</b></div>
+    <div class="stat"><div class="label">DCX HOLDING</div><b id="walletHolding">0 DCX</b></div>
+  </div>
+  <p class="small" id="walletCheckedAt">DCX holding has not been checked yet.</p>
+  <button class="secondary" id="refreshWalletStatusBtn" onclick="loadWalletStatus()">REFRESH WALLET STATUS</button>
+  <div class="notice">NO VERIFIED WALLET, NO MINING. Mining access will be enabled only after wallet verification succeeds.</div>
+</div>
+<div class="card"><h3>Withdraw (simulasi)</h3><div class="small">Demo saja: permintaan tidak dikirim dan tidak ada pembayaran crypto.</div><label class="label">Alamat wallet</label><input id="wallet" placeholder="Masukkan alamat wallet"><label class="label">Jumlah DCX</label><input id="amount" type="number" min="10" placeholder="Minimal 10 DCX"><button onclick="withdraw()">Ajukan withdraw demo</button><p id="wdmsg" class="small"></p><div class="notice">Jangan gunakan seed phrase atau private key. Untuk withdraw sungguhan perlu backend, validasi saldo, dan integrasi wallet/pembayaran.</div></div></section>
 <div class="notice" id="prototypeNotice">Prototype front-end gratis. Data saldo disimpan di browser perangkat ini dan mudah diubah; jangan gunakan untuk uang sungguhan.</div>
 </div>
 <script>
