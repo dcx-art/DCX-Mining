@@ -442,7 +442,7 @@ async function withdraw(){
   const amount=String(input.value||'').trim();
   const msg=document.getElementById('wdmsg');
   const button=document.getElementById('submitWithdrawBtn');
-  if(!/^\\d+(\\.\\d{1,9})?$/.test(amount)||Number(amount)<10000){
+  if(!/^\d+(\.\d{1,9})?$/.test(amount)||Number(amount)<10000){
     msg.textContent='Minimum withdrawal is 10,000 DCX. Use up to 9 decimal places.';
     return;
   }
