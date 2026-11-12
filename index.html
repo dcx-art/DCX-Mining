@@ -783,6 +783,17 @@ async function verifyWalletPayment(silent = false) {
   walletPaymentCheckBusy = true;
   if (button && !silent) button.disabled = true;
   try {
+    // Always read the authoritative account status first. If the backend has
+    // already confirmed payment, never keep scanning the chain or show stale pending text.
+    const accountStatus = await walletRequest('status');
+    if (accountStatus.wallet_verified) {
+      clearWalletPayment();
+      document.getElementById('walletStatusMessage').textContent = 'Wallet verified successfully.';
+      document.getElementById('walletPaymentPanel').style.display = 'none';
+      document.getElementById('walletPaymentDetails').style.display = 'none';
+      await loadWalletStatus();
+      return;
+    }
     const result = await walletRequest('verify_payment', { paymentId: activeWalletPaymentId });
     if (result.wallet_verified) {
       clearWalletPayment();
