@@ -352,7 +352,14 @@ margin-top:12px;
   <button class="secondary" id="refreshWalletStatusBtn" onclick="loadWalletStatus()">REFRESH WALLET STATUS</button>
   <div class="notice" id="walletVerificationNotice" style="display:none">NO VERIFIED WALLET, NO MINING. Mining access will be enabled only after wallet verification succeeds.</div>
 </div>
-<div class="card"><h3>Withdraw</h3><div class="notice"><b>Withdrawal rules</b><br>Minimum withdrawal: 10,000 DCX.<br>Maximum withdrawal: No limit, subject to your available DCX balance.<br>Request limit: Only 1 withdrawal request in every 24-hour period.<br>Processing time: Within 24 hours after a valid request is submitted.</div><div class="small">Withdrawal requests are not yet enabled in this app. This section currently shows the agreed rules only; no request or blockchain payment will be submitted.</div><label class="label">Withdrawal Amount (DCX)</label><div class="withdraw-input-row"><input id="amount" type="number" min="10000" step="0.000000001" placeholder="Minimum 10,000 DCX"><button type="button" class="max-btn" onclick="setMaxWithdraw()">MAX</button></div><p id="wdmsg" class="small"></p><div class="notice">Your verified TON wallet will be used as the withdrawal destination. Never share your seed phrase or private key.</div></div></section>
+<div class="card"><h3>Withdraw</h3><div class="notice"><b>Withdrawal rules</b><br>Minimum withdrawal: 10,000 DCX.<br>Maximum withdrawal: No limit, subject to your available DCX balance.<br>Request limit: Only 1 withdrawal request in every 24-hour period.<br>Processing time: Within 24 hours after a valid request is submitted.</div><div class="small">Withdrawal requests are not yet enabled in this app. This section currently shows the agreed rules only; no request or blockchain payment will be submitted.</div><label class="label">Withdrawal Amount (DCX)</label><div class="withdraw-input-row"><input id="amount" type="number" min="10000" step="0.000000001" placeholder="Minimum 10,000 DCX"><button type="button" class="max-btn" onclick="setMaxWithdraw()">MAX</button></div><p id="wdmsg" class="small"></p><div class="notice">Your verified TON wallet will be used as the withdrawal destination. Never share your seed phrase or private key.</div></div>
+<div class="card" id="dcxAdminTestPanel" style="display:none">
+  <h3>DCX Admin Tools</h3>
+  <p class="small">Send a safe test message to your Telegram admin account. This will not create a withdrawal request or change any DCX balance.</p>
+  <button class="secondary" id="dcxTestTelegramBtn" onclick="dcxTestTelegramNotification()">TEST TELEGRAM NOTIFICATION</button>
+  <p class="small" id="dcxAdminTestMessage"></p>
+</div>
+</section>
 <div class="notice" id="prototypeNotice">Prototype front-end gratis. Data saldo disimpan di browser perangkat ini dan mudah diubah; jangan gunakan untuk uang sungguhan.</div>
 </div>
 <script>
@@ -942,6 +949,63 @@ async function loadWalletStatus() {
 }
 
 initializeTonConnect();
+</script>
+
+
+<script>
+const DCX_WITHDRAW_API = 'https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/withdraw-api';
+
+async function dcxWithdrawApi(action) {
+  if (!window.Telegram?.WebApp?.initData) {
+    throw new Error('Please open DCX Mining through Telegram.');
+  }
+  const response = await fetch(DCX_WITHDRAW_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': 'sb_publishable_ts1Ofuwy7cat9DEX6NyI-Q_ZeLx3pwI'
+    },
+    body: JSON.stringify({
+      action,
+      initData: window.Telegram.WebApp.initData
+    })
+  });
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || 'Request failed.');
+  }
+  return result;
+}
+
+async function dcxLoadAdminTools() {
+  try {
+    const result = await dcxWithdrawApi('admin_check');
+    if (result.is_admin) {
+      document.getElementById('dcxAdminTestPanel').style.display = 'block';
+    }
+  } catch (_) {
+    // Non-admin users do not see the admin-only panel.
+  }
+}
+
+async function dcxTestTelegramNotification() {
+  const button = document.getElementById('dcxTestTelegramBtn');
+  const message = document.getElementById('dcxAdminTestMessage');
+  button.disabled = true;
+  message.textContent = 'Sending a test message to your Telegram account...';
+  try {
+    const result = await dcxWithdrawApi('admin_test_notification');
+    message.textContent = result.notification_sent
+      ? 'Test message sent. Please check your Telegram chat with @dcxmining_bot.'
+      : 'Telegram test message was not confirmed.';
+  } catch (error) {
+    message.textContent = error.message || 'Unable to send the test message.';
+  } finally {
+    button.disabled = false;
+  }
+}
+
+dcxLoadAdminTools();
 </script>
 
 </body>
