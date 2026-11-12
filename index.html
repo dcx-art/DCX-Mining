@@ -326,14 +326,9 @@ margin-top:12px;
     <div class="notice">Wallet verification costs 0.07 TON on TON Mainnet. This fee is non-refundable. TON network fees may be additional. Only continue if you agree.</div>
     <button class="secondary" id="beginWalletVerificationBtn" onclick="beginWalletVerification()">CONTINUE TO VERIFICATION</button>
     <div id="walletPaymentDetails" style="display:none">
-      <p class="small">Send exactly <b>0.07 TON</b> to this official DCX address:</p>
-      <input id="walletVerifyReceiver" readonly>
-      <button class="secondary" onclick="copyWalletField('walletVerifyReceiver')">COPY RECEIVER ADDRESS</button>
-      <p class="small">Payment comment (required):</p>
-      <input id="walletVerifyComment" readonly>
-      <button class="secondary" onclick="copyWalletField('walletVerifyComment')">COPY PAYMENT COMMENT</button>
+      <p class="small">Your connected wallet will ask you to confirm the 0.07 TON payment. After submission, DCX checks the transaction automatically.</p>
       <p class="small" id="walletPaymentExpiry"></p>
-      <button id="checkWalletPaymentBtn" onclick="verifyWalletPayment()">CHECK PAYMENT NOW</button>
+      <button id="checkWalletPaymentBtn" onclick="verifyWalletPayment()">CHECK PAYMENT STATUS</button>
     </div>
   </div>
   <div class="stats" style="margin-top:14px">
@@ -657,12 +652,10 @@ function restoreWalletPayment() {
       return;
     }
     activeWalletPaymentId = saved.paymentId;
-    document.getElementById('walletVerifyReceiver').value = saved.receiver || '';
-    document.getElementById('walletVerifyComment').value = saved.comment || '';
-    document.getElementById('walletPaymentExpiry').textContent = 'Request expires: ' + new Date(saved.expiresAt).toLocaleString();
+    document.getElementById('walletPaymentExpiry').textContent = 'Payment request expires: ' + new Date(saved.expiresAt).toLocaleString();
     document.getElementById('walletPaymentDetails').style.display = 'block';
     document.getElementById('walletPaymentPanel').style.display = 'block';
-    document.getElementById('walletStatusMessage').textContent = 'Automatic payment checking is active. Send the exact amount with the required comment; DCX will detect it automatically.';
+    document.getElementById('walletStatusMessage').textContent = 'A wallet payment request is active. If you already approved it, DCX is checking the TON network automatically. Otherwise, tap CONTINUE TO VERIFICATION to open your wallet.';
     startWalletPaymentAutoCheck();
     verifyWalletPayment(true);
   } catch {}
@@ -740,18 +733,45 @@ async function beginWalletVerification() {
   const button = document.getElementById('beginWalletVerificationBtn');
   button.disabled = true;
   try {
+    if (!tonConnectUI?.account?.address) {
+      throw new Error('Please connect your TON wallet again before continuing.');
+    }
     const result = await walletRequest('begin_verification');
+    if (!result.payload || !result.receiver_address || !result.amount_nano_ton) {
+      throw new Error('The secure TON payment request is incomplete. No payment was sent.');
+    }
+    if (tonConnectUI.account.chain && tonConnectUI.account.chain !== result.network) {
+      throw new Error('Your connected wallet is not on TON Mainnet. Switch to TON Mainnet and try again.');
+    }
+
     activeWalletPaymentId = result.payment_id;
-    document.getElementById('walletVerifyReceiver').value = result.receiver_address;
-    document.getElementById('walletVerifyComment').value = result.comment;
-    document.getElementById('walletPaymentExpiry').textContent = 'Request expires: ' + new Date(result.expires_at).toLocaleString();
+    saveWalletPayment({ paymentId: result.payment_id, expiresAt: result.expires_at });
+    document.getElementById('walletPaymentExpiry').textContent = 'Payment request expires: ' + new Date(result.expires_at).toLocaleString();
     document.getElementById('walletPaymentDetails').style.display = 'block';
-    saveWalletPayment({ paymentId: result.payment_id, receiver: result.receiver_address, comment: result.comment, expiresAt: result.expires_at });
-    document.getElementById('walletStatusMessage').textContent = 'Automatic checking is active. After you send the exact payment with the required comment, DCX will verify it automatically.';
+    document.getElementById('walletPaymentPanel').style.display = 'block';
+    document.getElementById('walletStatusMessage').textContent = 'Opening your connected wallet. Review the receiver and exact 0.07 TON amount there.';
+
+    await tonConnectUI.sendTransaction({
+      validUntil: Math.floor(Date.now() / 1000) + 300,
+      network: result.network,
+      messages: [{
+        address: result.receiver_address,
+        amount: String(result.amount_nano_ton),
+        payload: result.payload
+      }]
+    });
+
+    document.getElementById('walletStatusMessage').textContent = 'Wallet submitted the transaction. DCX is now checking the TON network automatically.';
     startWalletPaymentAutoCheck();
+    verifyWalletPayment(true);
   } catch (error) {
-    document.getElementById('walletStatusMessage').textContent = error.message || 'Unable to create verification request.';
-  } finally { button.disabled = false; }
+    const message = error?.message || 'Unable to open the wallet payment request.';
+    document.getElementById('walletStatusMessage').textContent = /declined|reject|cancel/i.test(message)
+      ? 'Payment canceled in your wallet. No TON was sent. You can try again when ready.'
+      : message;
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function verifyWalletPayment(silent = false) {
