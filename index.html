@@ -200,6 +200,11 @@ background:#0b1425;
 border-color:var(--gold);
 box-shadow:0 0 12px #f5c76b18;
 }
+.level-rule{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.level-rule .level-details{min-width:0}
+.level-rule .level-reward{text-align:right;white-space:nowrap}
+.level-rule.current{border-color:var(--gold);box-shadow:0 0 12px #f5c76b25}
+.level-rule.current .level-name{color:var(--gold);font-weight:800}
 input{
 width:100%;
 padding:13px;
@@ -307,8 +312,13 @@ margin-top:12px;
 <section id="level" class="section">
   <div class="card">
     <h3>DCX Mining Levels</h3>
-    <p class="small">Connect and verify your TON wallet on the Withdraw page. Your eligible level and DCX holding will be displayed there.</p>
-    <button class="secondary" onclick="tab('wd',document.querySelectorAll('.tabs button')[3])">GO TO WITHDRAW & WALLET</button>
+    <p class="small" id="levelIntro">Verify your TON wallet to activate your level information.</p>
+    <div class="stats" style="margin-top:12px">
+      <div class="stat"><div class="label">YOUR LEVEL</div><b id="levelCurrent">—</b></div>
+      <div class="stat"><div class="label">VERIFIED HOLDING</div><b id="levelHolding">—</b></div>
+    </div>
+    <p class="small" id="levelListMessage">Level rewards will appear here after wallet verification.</p>
+    <div id="levelRulesList"></div>
   </div>
 </section>
 <section id="wd" class="section">
@@ -406,7 +416,7 @@ if(connectionStatus){
     btn.disabled=false;
   }
 }
-function tab(id,btn){document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));document.getElementById(id).classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');}
+function tab(id,btn){document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));document.getElementById(id).classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();}
 function copyRef(){navigator.clipboard?.writeText(document.getElementById('refLink').value).then(()=>alert('Link disalin')); }
 function withdraw(){let a=Number(document.getElementById('amount').value),w=document.getElementById('wallet').value.trim();let msg=document.getElementById('wdmsg');if(!w||!a||a<10){msg.textContent='Isi alamat wallet dan jumlah minimal 10 DCX.';return;}if(a>balance){msg.textContent='Saldo demo tidak cukup.';return;}msg.textContent='Permintaan withdraw DEMO diterima di layar ini saja. Tidak ada transaksi blockchain.';}
 render();
@@ -678,6 +688,46 @@ async function walletRequest(action, extra = {}) {
   return result;
 }
 
+function formatDcx(value) {
+  return Number(value || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+}
+
+async function loadLevelRules() {
+  const list = document.getElementById('levelRulesList');
+  if (!list) return;
+  const verified = document.getElementById('walletVerifyStatus')?.textContent === 'VERIFIED';
+  if (!verified) {
+    document.getElementById('levelIntro').textContent = 'Verify your TON wallet to activate your level information.';
+    document.getElementById('levelCurrent').textContent = '—';
+    document.getElementById('levelHolding').textContent = '—';
+    document.getElementById('levelListMessage').textContent = 'The 100-level reward list will be available after wallet verification.';
+    list.innerHTML = '';
+    return;
+  }
+  try {
+    const result = await walletRequest('level_rules');
+    const currentLevel = Number(document.getElementById('walletLevel')?.textContent.replace(/[^0-9]/g, '') || 1);
+    const holding = Number((document.getElementById('walletHolding')?.textContent || '0').replace(/,/g, '').replace(/[^0-9.]/g, '') || 0);
+    document.getElementById('levelIntro').textContent = 'Your wallet is verified. Explore all 100 DCX levels and their daily rewards.';
+    document.getElementById('levelCurrent').textContent = 'Level ' + currentLevel;
+    document.getElementById('levelHolding').textContent = formatDcx(holding) + ' DCX';
+    document.getElementById('levelListMessage').textContent = (result.rules || []).length + ' levels · Sorted from Level 1 to Level 100 · Daily reward includes base and bonus.';
+    list.innerHTML = (result.rules || []).map(rule => {
+      const base = Number(rule.base_reward_dcx_per_day || 0);
+      const bonus = Number(rule.bonus_reward_dcx_per_day || 0);
+      const total = base + bonus;
+      const isCurrent = Number(rule.level) === currentLevel;
+      return '<div class="level level-rule' + (isCurrent ? ' current' : '') + '">' +
+        '<div class="level-details"><div class="level-name">LEVEL ' + Number(rule.level) + (isCurrent ? ' · YOUR LEVEL' : '') + '</div>' +
+        '<div class="small">Required holding: ' + formatDcx(rule.holding_required_dcx) + ' DCX</div></div>' +
+        '<div class="level-reward"><b>' + formatDcx(total) + ' DCX/day</b>' +
+        '<div class="small">Base ' + formatDcx(base) + (bonus > 0 ? ' + Bonus ' + formatDcx(bonus) : '') + '</div></div></div>';
+    }).join('');
+  } catch (error) {
+    document.getElementById('levelListMessage').textContent = error.message || 'Unable to load level rewards.';
+  }
+}
+
 async function connectWallet() {
   const message = document.getElementById('walletStatusMessage');
   if (!tonConnectUI) {
@@ -790,6 +840,7 @@ async function verifyWalletPayment(silent = false) {
       document.getElementById('walletStatusMessage').textContent = result.message || 'Wallet verification completed.';
       document.getElementById('walletPaymentPanel').style.display = 'none';
       await loadWalletStatus();
+      tab('level', document.querySelectorAll('.tabs button')[2]);
     } else if (result.pending) {
       if (!silent) document.getElementById('walletStatusMessage').textContent = result.message || 'Payment not detected yet. Automatic checking continues.';
       else document.getElementById('walletStatusMessage').textContent = 'Waiting for TON payment confirmation. Automatic checking is active.';
@@ -849,6 +900,7 @@ async function loadWalletStatus() {
     document.getElementById('walletAddressText').textContent = result.wallet_address ? formatTonFriendlyAddress(result.wallet_address) : 'No wallet connected yet.';
     document.getElementById('walletLevel').textContent = 'Level ' + Number(result.level || 1);
     document.getElementById('walletHolding').textContent = Number(result.wallet_balance_dcx || 0).toLocaleString('en-US') + ' DCX';
+    if (result.wallet_verified) loadLevelRules();
     document.getElementById('walletCheckedAt').textContent = result.wallet_balance_checked_at ? 'Last checked: ' + new Date(result.wallet_balance_checked_at).toLocaleString() : 'DCX holding has not been checked yet.';
     document.getElementById('walletPaymentPanel').style.display = result.wallet_address && !result.wallet_verified ? 'block' : 'none';
     document.getElementById('beginWalletVerificationBtn').style.display = result.wallet_verified ? 'none' : 'block';
