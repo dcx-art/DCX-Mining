@@ -353,16 +353,17 @@ const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();let u=tg.initDat
 const params = new URLSearchParams(location.search);
 const start = params.get('startapp') || params.get('tgWebAppStartParam') || tg?.initDataUnsafe?.start_param || '';
 const uid=tg?.initDataUnsafe?.user?.id||'demo-user';document.getElementById('refLink').value='https://t.me/dcxmining_bot/DCXMining?startapp='+uid;
-let balance=0, active=false, startAt=0, pendingReward=0;
+let balance=0, active=false, startAt=0, pendingReward=0, miningLocked=false;
 let rewardSnapshotAt=Date.now();
 const rate=10; document.getElementById('rate').textContent=rate.toFixed(2)+' DCX/H';
 function render(){
   document.getElementById('balance').textContent=balance.toFixed(4);
   document.getElementById('status').textContent=active?'Aktif':'Tidak aktif';
   document.getElementById('orb').classList.toggle('active',active);
-  document.getElementById('mineBtn').textContent=active?'CLAIM DCX':'START MINING';
+  document.getElementById('mineBtn').textContent=miningLocked?'VERIFY WALLET FIRST':(active?'CLAIM DCX':'START MINING');
+  document.getElementById('mineBtn').disabled=miningLocked;
   document.getElementById('earned').textContent=Math.min(240,pendingReward).toFixed(4)+' DCX';
-  document.getElementById('timer').textContent=active?'Mining Active Since'+new Date(startAt).toLocaleString('id-ID'):'Mining Not Started';
+  document.getElementById('timer').textContent=miningLocked?'Wallet verification required. Please visit Withdraw.':(active?'Mining Active Since'+new Date(startAt).toLocaleString('id-ID'):'Mining Not Started');
 }
 
 async function miningRequest(action){
@@ -384,6 +385,7 @@ async function refreshMining(){
   const result=await miningRequest('status');console.log('STATUS MINING:',result);
   balance=Number(result.balance||0);
   active=Boolean(result.mining_active);
+  miningLocked=Boolean(result.mining_locked);
   pendingReward=Number(result.pending_reward||0);rewardSnapshotAt=Date.now();
   startAt=result.user?.mining_started_at
     ?new Date(result.user.mining_started_at).getTime():0;
