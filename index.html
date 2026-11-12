@@ -358,6 +358,12 @@ margin-top:12px;
   <p class="small">Send a safe test message to your Telegram admin account. This will not create a withdrawal request or change any DCX balance.</p>
   <button class="secondary" id="dcxTestTelegramBtn" onclick="dcxTestTelegramNotification()">TEST TELEGRAM NOTIFICATION</button>
   <p class="small" id="dcxAdminTestMessage"></p>
+  <hr style="border:0;border-top:1px solid #344968;margin:18px 0">
+  <h3>Withdrawal Queue</h3>
+  <p class="small">Review requests below. Send DCX manually from the Payout Wallet only after checking the verified destination.</p>
+  <button class="secondary" id="dcxRefreshWithdrawalsBtn" onclick="dcxLoadWithdrawals()">REFRESH WITHDRAWAL QUEUE</button>
+  <p class="small" id="dcxWithdrawalsMessage">Press refresh to load requests.</p>
+  <div id="dcxWithdrawalsList"></div>
 </div>
 </section>
 <div class="notice" id="prototypeNotice">Prototype front-end gratis. Data saldo disimpan di browser perangkat ini dan mudah diubah; jangan gunakan untuk uang sungguhan.</div>
@@ -967,7 +973,8 @@ async function dcxWithdrawApi(action) {
     },
     body: JSON.stringify({
       action,
-      initData: window.Telegram.WebApp.initData
+      initData: window.Telegram.WebApp.initData,
+      ...(arguments[1] || {})
     })
   });
   const result = await response.json();
@@ -985,6 +992,94 @@ async function dcxLoadAdminTools() {
     }
   } catch (_) {
     // Non-admin users do not see the admin-only panel.
+  }
+}
+
+function dcxAdminText(tag, value, style = '') {
+  const node = document.createElement(tag);
+  node.textContent = value == null ? '' : String(value);
+  if (style) node.style.cssText = style;
+  return node;
+}
+
+async function dcxLoadWithdrawals() {
+  const button = document.getElementById('dcxRefreshWithdrawalsBtn');
+  const message = document.getElementById('dcxWithdrawalsMessage');
+  const list = document.getElementById('dcxWithdrawalsList');
+  button.disabled = true;
+  message.textContent = 'Loading withdrawal requests...';
+  list.replaceChildren();
+  try {
+    const result = await dcxWithdrawApi('admin_list');
+    const requests = Array.isArray(result.requests) ? result.requests : [];
+    if (!requests.length) {
+      message.textContent = 'No pending or processing withdrawal requests.';
+      return;
+    }
+    message.textContent = requests.length + ' active withdrawal request(s).';
+    requests.forEach(request => {
+      const card = document.createElement('div');
+      card.className = 'level';
+      card.append(
+        dcxAdminText('b', 'Request #' + request.id),
+        dcxAdminText('p', 'Amount: ' + request.amount_dcx + ' DCX', 'margin:7px 0'),
+        dcxAdminText('p', 'Status: ' + String(request.status || '').toUpperCase(), 'margin:7px 0'),
+        dcxAdminText('p', 'Created: ' + new Date(request.created_at).toLocaleString(), 'margin:7px 0'),
+        dcxAdminText('p', 'Verified destination wallet:', 'margin:7px 0')
+      );
+      const address = dcxAdminText('p', request.wallet_address, 'font-size:11px;overflow-wrap:anywhere;word-break:break-all;background:#080f1c;padding:9px;border-radius:8px');
+      card.append(address);
+      const copy = document.createElement('button');
+      copy.className = 'secondary';
+      copy.textContent = 'COPY DESTINATION ADDRESS';
+      copy.style.marginTop = '6px';
+      copy.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(String(request.wallet_address || ''));
+          message.textContent = 'Destination address copied for request #' + request.id + '.';
+        } catch (_) {
+          message.textContent = 'Copy unavailable. Select the address manually.';
+        }
+      };
+      card.append(copy);
+      const actions = document.createElement('div');
+      actions.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px';
+      if (request.status === 'pending') {
+        const processing = document.createElement('button');
+        processing.textContent = 'MARK PROCESSING';
+        processing.onclick = () => dcxAdminUpdateRequest('admin_processing', request.id);
+        actions.append(processing);
+      }
+      const reject = document.createElement('button');
+      reject.className = 'secondary';
+      reject.textContent = 'REJECT & REFUND';
+      reject.onclick = () => dcxAdminUpdateRequest('admin_reject', request.id);
+      actions.append(reject);
+      card.append(actions);
+      list.append(card);
+    });
+  } catch (error) {
+    message.textContent = error.message || 'Unable to load withdrawal requests.';
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function dcxAdminUpdateRequest(action, requestId) {
+  const isReject = action === 'admin_reject';
+  const promptText = isReject
+    ? 'Reject request #' + requestId + ' and refund its reserved DCX balance?'
+    : 'Mark request #' + requestId + ' as PROCESSING?';
+  if (!confirm(promptText)) return;
+  try {
+    const result = await dcxWithdrawApi(action, { requestId });
+    if (!result.success) throw new Error(result.error || 'Unable to update request.');
+    document.getElementById('dcxWithdrawalsMessage').textContent =
+      'Request #' + requestId + ' updated: ' + result.status + '.';
+    await dcxLoadWithdrawals();
+  } catch (error) {
+    document.getElementById('dcxWithdrawalsMessage').textContent =
+      error.message || 'Unable to update request.';
   }
 }
 
