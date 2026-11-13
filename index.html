@@ -600,6 +600,39 @@ input:focus{
   .card,.stat,.level,.notice,.withdraw-input-row{animation:none}
 }
 
+
+/* Official DCX coin-inspired metallic gold balance */
+.balance #balance{
+  display:inline-block;
+  color:#ffe28a;
+  background:linear-gradient(
+    112deg,
+    #9b6414 0%,
+    #e8b83f 16%,
+    #fff2ad 30%,
+    #c98a1c 43%,
+    #fff4c2 55%,
+    #e2ad35 69%,
+    #fff0a0 82%,
+    #a96e16 100%
+  );
+  background-size:240% 100%;
+  background-position:0% 50%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(91,51,4,.5)) drop-shadow(0 0 9px rgba(255,202,70,.24));
+  animation:dcxBalanceGoldShine 6s ease-in-out infinite;
+}
+@keyframes dcxBalanceGoldShine{
+  0%,100%{background-position:0% 50%;filter:drop-shadow(0 1px 0 rgba(91,51,4,.5)) drop-shadow(0 0 7px rgba(255,202,70,.20))}
+  50%{background-position:100% 50%;filter:drop-shadow(0 1px 0 rgba(91,51,4,.5)) drop-shadow(0 0 13px rgba(255,218,104,.42))}
+}
+@media(prefers-reduced-motion:reduce){
+  .balance #balance{animation:none;background-position:50% 50%}
+}
+
 </style>
 
 </head>
