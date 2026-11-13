@@ -375,6 +375,73 @@ button.secondary{
   50%{transform:scale(1.035);filter:brightness(1.12)}
 }
 
+
+/* Refined cyber atmosphere and accessible micro-interactions */
+body:after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.24;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(255,255,255,.72) 0 1px,transparent 1.7px),
+    radial-gradient(circle at 78% 12%,rgba(32,220,255,.85) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 88% 62%,rgba(147,100,255,.8) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 24% 76%,rgba(32,220,255,.7) 0 1px,transparent 1.8px),
+    radial-gradient(ellipse at 50% 52%,rgba(18,91,190,.10),transparent 62%);
+  background-size:173px 191px,227px 239px,193px 211px,251px 223px,100% 100%;
+}
+.card,.stat,.level{
+  transition:border-color .22s ease,box-shadow .22s ease,background-color .22s ease;
+}
+.card:focus-within,.stat:focus-within,.level:focus-within{
+  border-color:rgba(66,220,255,.82);
+  box-shadow:0 0 0 1px rgba(32,220,255,.12),0 0 22px rgba(0,153,255,.14),inset 0 1px 0 rgba(140,220,255,.10);
+}
+button{
+  transition:transform .16s ease,filter .2s ease,box-shadow .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+button:active{
+  transform:translateY(1px) scale(.99);
+  filter:brightness(1.08);
+}
+button:focus-visible,input:focus-visible{
+  outline:2px solid #8cefff;
+  outline-offset:3px;
+}
+#mineBtn{
+  background-size:180% 100%;
+  animation:dcxGoldShimmer 5.5s ease-in-out infinite;
+}
+@keyframes dcxGoldShimmer{
+  0%,100%{background-position:0% 50%;box-shadow:0 0 16px rgba(255,197,55,.27),inset 0 1px 0 rgba(255,255,255,.55)}
+  50%{background-position:100% 50%;box-shadow:0 0 23px rgba(255,197,55,.40),inset 0 1px 0 rgba(255,255,255,.62)}
+}
+.orb::before{
+  animation:dcxElectricOrbit 3.2s linear infinite,dcxElectricFlicker 1.35s ease-in-out infinite alternate;
+}
+.orb::after{
+  animation:dcxElectricOrbitReverse 1.9s linear infinite,dcxElectricFlicker 1.8s ease-in-out infinite alternate-reverse;
+}
+@keyframes dcxElectricFlicker{
+  0%{filter:brightness(.88) drop-shadow(0 0 3px #20dcff) drop-shadow(0 0 7px #526dff)}
+  100%{filter:brightness(1.32) drop-shadow(0 0 6px #20dcff) drop-shadow(0 0 14px #8a72ff)}
+}
+@media(max-width:520px){
+  .brand{letter-spacing:1.7px}
+  .card{box-shadow:0 10px 26px rgba(0,0,0,.34),0 0 15px rgba(0,153,255,.08),inset 0 1px 0 rgba(140,220,255,.08)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
+
 /* DCX electric energy orbit — decorative layer only */
 .orb{
   position:relative;
