@@ -353,7 +353,7 @@ margin-top:12px;
     <div class="stat"><div class="label">DCX HOLDING</div><b id="walletHolding">0 DCX</b></div>
   </div>
   <p class="small" id="walletCheckedAt">DCX holding has not been checked yet.</p>
-  <button class="secondary" id="refreshWalletStatusBtn" onclick="loadWalletStatus()">REFRESH WALLET STATUS</button>
+  <button class="secondary" id="refreshWalletStatusBtn" onclick="refreshWalletBalance()">REFRESH DCX HOLDING & LEVEL</button>
   <div class="notice" id="walletVerificationNotice" style="display:none">NO VERIFIED WALLET, NO MINING. Mining access will be enabled only after wallet verification succeeds.</div>
 </div>
 <div class="card"><h3>Withdraw</h3><div class="notice"><b>Withdrawal rules</b><br>Minimum withdrawal: 10,000 DCX.<br>Maximum withdrawal: No limit, subject to your available DCX balance.<br>Request limit: Only 1 withdrawal request in every 24-hour period.<br>Processing time: Within 24 hours after a valid request is submitted.</div><div class="small">Manual processing: your request will be reviewed by the DCX admin and paid to your verified TON wallet within 24 hours. Payment is sent manually from the DCX Payout Wallet.</div><label class="label">Withdrawal Amount (DCX)</label><div class="withdraw-input-row"><input id="amount" type="number" min="10000" step="0.000000001" placeholder="Minimum 10,000 DCX"><button type="button" class="max-btn" onclick="setMaxWithdraw()">MAX</button></div><button id="submitWithdrawBtn" onclick="withdraw()">SUBMIT WITHDRAWAL REQUEST</button><p id="wdmsg" class="small"></p><div class="notice">Your verified TON wallet will be used as the withdrawal destination. Never share your seed phrase or private key.</div></div>
@@ -952,6 +952,32 @@ function formatTonFriendlyAddress(rawAddress) {
     return btoa(binary).split('+').join('-').split('/').join('_').replace(/=+$/g, '');
   } catch (_) {
     return rawAddress;
+  }
+}
+
+async function refreshWalletBalance() {
+  const button = document.getElementById('refreshWalletStatusBtn');
+  const message = document.getElementById('walletStatusMessage');
+  if (!button || !message) return;
+  button.disabled = true;
+  message.textContent = 'Checking your DCX holding on TON Mainnet...';
+  try {
+    const result = await walletRequest('refresh_balance');
+    const wallet = result.wallet || {};
+    document.getElementById('walletLevel').textContent =
+      'Level ' + Number(wallet.level || 1);
+    document.getElementById('walletHolding').textContent =
+      Number(wallet.wallet_balance_dcx || 0).toLocaleString('en-US') + ' DCX';
+    document.getElementById('walletCheckedAt').textContent =
+      wallet.wallet_balance_checked_at
+        ? 'Last checked: ' + new Date(wallet.wallet_balance_checked_at).toLocaleString()
+        : 'DCX holding has not been checked yet.';
+    await loadLevelRules();
+    message.textContent = 'DCX holding and mining level updated successfully.';
+  } catch (error) {
+    message.textContent = error.message || 'Unable to refresh DCX holding.';
+  } finally {
+    button.disabled = false;
   }
 }
 
