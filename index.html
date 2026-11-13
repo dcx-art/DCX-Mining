@@ -1197,16 +1197,17 @@ async function dcxLoadWithdrawals() {
         dcxAdminText('p', 'Created: ' + new Date(request.created_at).toLocaleString(), 'margin:7px 0'),
         dcxAdminText('p', 'Verified destination wallet:', 'margin:7px 0')
       );
-      const address = dcxAdminText('p', request.wallet_address, 'font-size:11px;overflow-wrap:anywhere;word-break:break-all;background:#080f1c;padding:9px;border-radius:8px');
+      const friendlyAddress = formatTonFriendlyAddress(request.wallet_address);
+      const address = dcxAdminText('p', friendlyAddress, 'font-size:11px;overflow-wrap:anywhere;word-break:break-all;background:#080f1c;padding:9px;border-radius:8px');
       card.append(address);
       const copy = document.createElement('button');
       copy.className = 'secondary';
-      copy.textContent = 'COPY DESTINATION ADDRESS';
+      copy.textContent = 'COPY FRIENDLY ADDRESS';
       copy.style.marginTop = '6px';
       copy.onclick = async () => {
         try {
-          await navigator.clipboard.writeText(String(request.wallet_address || ''));
-          message.textContent = 'Destination address copied for request #' + request.id + '.';
+          await navigator.clipboard.writeText(String(friendlyAddress || ''));
+          message.textContent = 'Friendly destination address copied for request #' + request.id + '.';
         } catch (_) {
           message.textContent = 'Copy unavailable. Select the address manually.';
         }
