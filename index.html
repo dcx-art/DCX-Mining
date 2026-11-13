@@ -284,7 +284,7 @@ margin-top:12px;
 <section id="ref" class="section">
   <div class="card">
     <h3>Referral Program</h3>
-    <p>Invite friends and earn 100 DCX for each successful referral.</p>
+    <p>Earn 100 DCX when a referred account successfully verifies its wallet.</p>
 
     <div class="label">Your Referral Link</div>
     <input id="refLink" readonly>
@@ -306,9 +306,13 @@ margin-top:12px;
       <span class="small">Claimed Rewards</span>
       <b id="refClaimed">0 DCX</b>
     </div>
+    <div class="row">
+      <span class="small">Pending Wallet Verification</span>
+      <b id="refPending">0</b>
+    </div>
 
     <button id="claimRefBtn" onclick="claimReferral()">CLAIM REWARD</button>
-    <p class="small" id="refMessage">Each successful referral earns 100 DCX.</p>
+    <p class="small" id="refMessage">Rewards become available after the referred account verifies its wallet.</p>
   </div>
 </section>
 
@@ -591,7 +595,10 @@ async function loadReferral() {
     document.getElementById('refClaimed').textContent =
       Number(result.claimed_reward).toFixed(2) + ' DCX';
 
-    message.textContent = 'Referral data updated successfully.';
+    document.getElementById('refPending').textContent =
+      Number(result.pending_referrals || 0);
+
+    message.textContent = 'Rewards unlock after wallet verification.';
   } catch (error) {
     message.textContent = error.message;
   }
