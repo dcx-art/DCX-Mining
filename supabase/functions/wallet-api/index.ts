@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { Address, Cell } from "npm:@ton/core@0.59.0";
+import { Address, beginCell, Cell } from "npm:@ton/core@0.59.0";
 import { Buffer } from "node:buffer";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -14,7 +14,7 @@ const TON_API = "https://toncenter.com/api/v3";
 const TON_NETWORK = "-239";
 const TOKEN_MASTER = "EQBngyvuH7wWCW_sYUyC0iyb7uPFvkG2eiR0BscnMqa_k6AS";
 const VERIFY_RECEIVER = "UQDZJan6ICt2fXxKzPxjGFA-ztTb6mvLtmbEnwoeGn5UH_JN";
-const VERIFY_NANO_TON = 70000000n;
+const VERIFY_NANO_TON = 90000000n;
 const NANO = 1000000000n;
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
@@ -72,7 +72,12 @@ async function verifyTelegram(initData: string): Promise<string> {
 }
 
 function rawAddress(value: string): string {
-  return Address.parse(value).toRawString();
+  const normalized = value.trim();
+  try {
+    return Address.parse(normalized).toRawString();
+  } catch {
+    return Address.parseFriendly(normalized).address.toRawString();
+  }
 }
 
 function decimalToNano(value: string | number): bigint {
@@ -99,15 +104,37 @@ async function getUser(telegramId: string) {
 async function tonFetch(path: string) {
   const headers: Record<string, string> = {};
   if (TONCENTER_API_KEY) headers["X-API-Key"] = TONCENTER_API_KEY;
-  const response = await fetch(`${TON_API}${path}`, { headers });
-  const text = await response.text();
-  if (!response.ok) {
-    throw new Error(`TON Center gagal (${response.status}). Coba lagi nanti.`);
+  let lastError: unknown = null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
+    try {
+      const response = await fetch(`${TON_API}${path}`, { headers, signal: controller.signal });
+      const body = await response.text();
+      if (!response.ok) {
+        const retryable = response.status === 429 || response.status >= 500;
+        if (retryable && attempt < 2) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+          continue;
+        }
+        throw new Error(`TON Center gagal (${response.status}). Coba periksa kembali.`);
+      }
+      let data: any;
+      try { data = JSON.parse(body); } catch { throw new Error("Respons TON Center tidak valid"); }
+      if (data?.error) throw new Error("TON Center: " + String(data.error));
+      return data;
+    } catch (error) {
+      lastError = error;
+      if (attempt >= 2) break;
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } finally {
+      clearTimeout(timeout);
+    }
   }
-  let data: any;
-  try { data = JSON.parse(text); } catch { throw new Error("Respons TON Center tidak valid"); }
-  if (data?.error) throw new Error("TON Center: " + String(data.error));
-  return data;
+  if (lastError instanceof Error && lastError.name === "AbortError") {
+    throw new Error("TON Center terlalu lama merespons. Pengecekan akan dicoba kembali.");
+  }
+  throw new Error(lastError instanceof Error ? lastError.message : "TON Center tidak dapat dihubungi.");
 }
 
 async function readDcxBalance(walletAddress: string): Promise<{ raw: string; decimal: string }> {
@@ -169,30 +196,69 @@ function readVerificationComment(body: string | undefined): string | null {
   }
 }
 
+function tryRawAddress(value: unknown): string | null {
+  if (typeof value !== "string" || !value.trim()) return null;
+  try { return rawAddress(value.trim()); } catch { return null; }
+}
+
 async function findPaymentTransaction(payment: any) {
+  const createdAt = new Date(payment.created_at).getTime();
+  const expiresAt = new Date(payment.expires_at).getTime();
+  if (!Number.isFinite(createdAt) || !Number.isFinite(expiresAt)) {
+    throw new Error("Waktu permintaan pembayaran tidak valid");
+  }
+
+  // Normalize friendly (UQ/EQ) and raw (workchain:hash) addresses before querying TON Center.
+  const expectedSource = tryRawAddress(payment.wallet_address);
+  const expectedDestination = tryRawAddress(VERIFY_RECEIVER);
+  if (!expectedSource || !expectedDestination) {
+    throw new Error("Alamat wallet verifikasi tidak valid");
+  }
+
+  // Restrict the lookup to the payment's validity window.
   const query = new URLSearchParams({
-    account: VERIFY_RECEIVER,
-    limit: "100",
+    account: expectedSource,
+    start_utime: String(Math.max(0, Math.floor(createdAt / 1000) - 60)),
+    end_utime: String(Math.floor(expiresAt / 1000)),
+    limit: "1000",
     sort: "desc",
   });
   const data = await tonFetch(`/transactions?${query.toString()}`);
   const transactions = Array.isArray(data.transactions) ? data.transactions : [];
-  const expectedSource = rawAddress(payment.wallet_address);
-  const expectedDestination = rawAddress(VERIFY_RECEIVER);
+  if (!expectedSource || !expectedDestination) {
+    throw new Error("Alamat wallet verifikasi tidak valid");
+  }
   const expectedComment = `DCX-VERIFY:${payment.payment_reference}`;
-  const createdAt = new Date(payment.created_at).getTime();
 
   for (const tx of transactions) {
-    const msg = tx.in_msg;
-    if (!msg || tx.description?.aborted === true || msg.bounced === true) continue;
+    const description = tx?.description;
+    if (!tx?.hash) continue;
+    if (description?.aborted === true) continue;
+    if (description?.compute_ph?.success !== true) continue;
+    if (description?.action?.success !== true) continue;
     if (Number(tx.mc_block_seqno || 0) <= 0) continue;
-    if (rawAddress(msg.source) !== expectedSource) continue;
-    if (rawAddress(msg.destination) !== expectedDestination) continue;
-    if (BigInt(msg.value || "0") !== VERIFY_NANO_TON) continue;
-    if (readVerificationComment(msg.message_content?.body) !== expectedComment) continue;
-    if (Number(tx.now || 0) * 1000 < createdAt) continue;
-    if (!tx.hash) continue;
-    return String(tx.hash);
+
+    const txTime = Number(tx.now || 0) * 1000;
+        if (!Number.isFinite(txTime) || txTime < createdAt) continue;
+    // A payment made before the request expiry remains eligible for settlement,
+    // even if the user retries verification after that expiry.
+    if (Number.isFinite(expiresAt) && txTime > expiresAt) continue;
+
+    const outbound = Array.isArray(tx.out_msgs) ? tx.out_msgs : [];
+    for (const msg of outbound) {
+      if (!msg || msg.bounced === true) continue;
+      const source = tryRawAddress(msg.source);
+      const destination = tryRawAddress(msg.destination);
+      if (source !== expectedSource || destination !== expectedDestination) continue;
+
+      let value: bigint;
+      try { value = BigInt(String(msg.value || "0")); } catch { continue; }
+      const expectedAmount = BigInt(String(payment.amount_nano_ton || VERIFY_NANO_TON));
+      if (value !== expectedAmount) continue;
+      if (readVerificationComment(msg.message_content?.body) !== expectedComment) continue;
+
+      return String(tx.hash);
+    }
   }
   return null;
 }
@@ -206,7 +272,12 @@ Deno.serve(async (req: Request) => {
     const action = String(body.action || "");
 
     if (action === "sync_all") {
-      if (!WALLET_SYNC_SECRET || req.headers.get("x-wallet-sync-secret") !== WALLET_SYNC_SECRET) {
+      const suppliedSecret = req.headers.get("x-wallet-sync-secret") || "";
+      const { data: syncAuthorized, error: syncAuthError } = await supabase.rpc(
+        "verify_dcx_wallet_sync_secret",
+        { p_candidate: suppliedSecret },
+      );
+      if (syncAuthError || syncAuthorized !== true) {
         return json({ success: false, error: "Akses sinkronisasi ditolak" }, 401);
       }
       const { data: users, error } = await supabase.from(TABLE)
@@ -228,6 +299,14 @@ Deno.serve(async (req: Request) => {
     const telegramId = await verifyTelegram(String(body.initData || ""));
     const user = await getUser(telegramId);
 
+    if (action === "level_rules") {
+      const { data: rules, error } = await supabase.from("dcx_level_rules")
+        .select("level, holding_required_dcx, base_reward_dcx_per_day, bonus_reward_dcx_per_day")
+        .order("level", { ascending: true });
+      if (error) throw new Error("Gagal membaca daftar level DCX: " + error.message);
+      return json({ success: true, rules: rules || [] });
+    }
+
     if (action === "status") {
       return json({
         success: true,
@@ -236,32 +315,110 @@ Deno.serve(async (req: Request) => {
         wallet_balance_dcx: String(user.wallet_balance_dcx || "0"),
         wallet_balance_checked_at: user.wallet_balance_checked_at,
         level: Number(user.level || 1),
-        verification_fee_ton: "0.07",
+        verification_fee_ton: "0.09",
         verification_receiver: VERIFY_RECEIVER,
         network: "TON mainnet",
       });
     }
 
+    if (action === "pending_verification") {
+      if (!user.wallet_address) return json({ success: true, pending: false });
+      const { data: payment, error } = await supabase.from("wallet_verification_payments")
+        .select("id, expires_at, payment_reference")
+        .eq("telegram_id", telegramId)
+        .eq("wallet_address", user.wallet_address)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return json(payment
+        ? { success: true, pending: true, payment_id: payment.id, expires_at: payment.expires_at }
+        : { success: true, pending: false });
+    }
+
     if (action === "connect_wallet") {
       const address = String(body.walletAddress || "").trim();
-      const normalized = rawAddress(address);
-      const existing = user.wallet_address ? rawAddress(user.wallet_address) : null;
-      if (existing === normalized) {
-        return json({ success: true, wallet_address: user.wallet_address, wallet_verified: Boolean(user.wallet_verified) });
+      if (!address) throw new Error("Alamat wallet tidak boleh kosong");
+      const normalized = rawAddress(address).toLowerCase();
+      const existing = user.wallet_address ? rawAddress(user.wallet_address).toLowerCase() : null;
+
+      const [walletLockResult, accountLockResult] = await Promise.all([
+        supabase.from("dcx_wallet_identity_locks")
+          .select("wallet_address, telegram_id, verified_at, transaction_hash")
+          .eq("wallet_address", normalized).maybeSingle(),
+        supabase.from("dcx_wallet_identity_locks")
+          .select("wallet_address, telegram_id, verified_at, transaction_hash")
+          .eq("telegram_id", telegramId).maybeSingle(),
+      ]);
+      if (walletLockResult.error) throw walletLockResult.error;
+      if (accountLockResult.error) throw accountLockResult.error;
+
+      const walletLock = walletLockResult.data;
+      const accountLock = accountLockResult.data;
+
+      if (walletLock && String(walletLock.telegram_id) !== telegramId) {
+        throw new Error("Wallet ini sudah terkunci permanen pada akun Telegram lain.");
       }
-      const { data, error } = await supabase.from(TABLE).update({
-        wallet_address: address,
-        wallet_verified: false,
-        wallet_verified_at: null,
-        wallet_balance_dcx: 0,
-        wallet_balance_checked_at: null,
-        level: 1,
-        wallet_verification_tx_hash: null,
-      }).eq("telegram_id", telegramId)
+      if (accountLock && accountLock.wallet_address !== normalized) {
+        throw new Error("Akun Telegram ini sudah memiliki wallet verified yang terkunci. Hubungi dukungan DCX untuk perubahan kepemilikan.");
+      }
+      if (user.wallet_verified === true && existing !== normalized) {
+        throw new Error("Wallet akun ini sudah verified dan tidak dapat diganti melalui aplikasi.");
+      }
+
+      const previouslyVerified = Boolean(
+        walletLock && accountLock &&
+        String(walletLock.telegram_id) === telegramId &&
+        String(accountLock.telegram_id) === telegramId &&
+        walletLock.wallet_address === normalized &&
+        accountLock.wallet_address === normalized
+      );
+
+      if (existing === normalized && user.wallet_verified === true && previouslyVerified) {
+        return json({
+          success: true,
+          wallet_address: user.wallet_address,
+          wallet_verified: true,
+        });
+      }
+
+      if (existing === normalized && !previouslyVerified) {
+        return json({
+          success: true,
+          wallet_address: user.wallet_address,
+          wallet_verified: Boolean(user.wallet_verified),
+        });
+      }
+
+      const updateValues = previouslyVerified
+        ? {
+            wallet_address: normalized,
+            wallet_verified: true,
+            wallet_verified_at: walletLock.verified_at,
+            wallet_balance_dcx: 0,
+            wallet_balance_checked_at: null,
+            level: 1,
+            wallet_verification_tx_hash: walletLock.transaction_hash,
+          }
+        : {
+            wallet_address: normalized,
+            wallet_verified: false,
+            wallet_verified_at: null,
+            wallet_balance_dcx: 0,
+            wallet_balance_checked_at: null,
+            level: 1,
+            wallet_verification_tx_hash: null,
+          };
+
+      const { data, error } = await supabase.from(TABLE).update(updateValues)
+        .eq("telegram_id", telegramId)
         .select("wallet_address, wallet_verified, level")
         .single();
       if (error) {
-        if (error.code === "23505") throw new Error("Wallet ini sudah terhubung ke akun DCX lain");
+        if (error.code === "23505") {
+          throw new Error("Wallet ini sudah terhubung atau terkunci pada akun DCX lain.");
+        }
         throw error;
       }
       return json({ success: true, ...data });
@@ -269,26 +426,61 @@ Deno.serve(async (req: Request) => {
 
     if (action === "begin_verification") {
       if (!user.wallet_address) throw new Error("Hubungkan wallet TON terlebih dahulu");
-      const reference = crypto.randomUUID();
-      const expiresAt = new Date(Date.now() + 20 * 60 * 1000).toISOString();
-      const { data, error } = await supabase.from("wallet_verification_payments").insert({
-        telegram_id: telegramId,
-        wallet_address: user.wallet_address,
-        receiver_address: VERIFY_RECEIVER,
-        amount_nano_ton: Number(VERIFY_NANO_TON),
-        payment_reference: reference,
-        expires_at: expiresAt,
-        status: "pending",
-      }).select("id, payment_reference, expires_at").single();
-      if (error) throw error;
+      const now = new Date().toISOString();
+      const { data: existing, error: existingError } = await supabase
+        .from("wallet_verification_payments")
+        .select("id, payment_reference, expires_at, amount_nano_ton")
+        .eq("telegram_id", telegramId)
+        .eq("wallet_address", user.wallet_address)
+        .eq("status", "pending")
+        .gt("expires_at", now)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (existingError) throw existingError;
+
+      let payment = existing;
+      if (!payment) {
+        const reference = crypto.randomUUID();
+        const expiresAt = new Date(Date.now() + 20 * 60 * 1000).toISOString();
+        const { data, error } = await supabase.from("wallet_verification_payments").insert({
+          telegram_id: telegramId,
+          wallet_address: user.wallet_address,
+          receiver_address: VERIFY_RECEIVER,
+          amount_nano_ton: Number(VERIFY_NANO_TON),
+          payment_reference: reference,
+          expires_at: expiresAt,
+          status: "pending",
+        }).select("id, payment_reference, expires_at, amount_nano_ton").single();
+        if (error) throw error;
+        payment = data;
+      }
+
+      const comment = `DCX-VERIFY:${payment.payment_reference}`;
+      const payload = beginCell()
+        .storeUint(0, 32)
+        .storeStringTail(comment)
+        .endCell()
+        .toBoc()
+        .toString("base64");
+
+      // Internal round-trip test: ensure the generated TON comment payload
+      // can be decoded by the exact parser used for incoming transactions.
+      const decodedComment = readVerificationComment(payload);
+      if (decodedComment !== comment) {
+        throw new Error("Uji internal payload TON gagal. Tidak ada pembayaran yang dikirim.");
+      }
+      console.info("TON payload round-trip self-test passed", { paymentId: payment.id });
+
       return json({
         success: true,
-        payment_id: data.id,
-        payment_reference: data.payment_reference,
-        comment: `DCX-VERIFY:${data.payment_reference}`,
-        expires_at: data.expires_at,
+        payment_id: payment.id,
+        payment_reference: payment.payment_reference,
+        comment,
+        payload,
+        expires_at: payment.expires_at,
         receiver_address: VERIFY_RECEIVER,
-        amount_nano_ton: String(VERIFY_NANO_TON),
+        amount_nano_ton: String(payment.amount_nano_ton || VERIFY_NANO_TON),
         network: TON_NETWORK,
       });
     }
@@ -299,15 +491,69 @@ Deno.serve(async (req: Request) => {
       const { data: payment, error } = await supabase.from("wallet_verification_payments")
         .select("*").eq("id", paymentId).eq("telegram_id", telegramId).maybeSingle();
       if (error || !payment) throw new Error("Permintaan verifikasi tidak ditemukan");
-      if (payment.status === "verified") return json({ success: true, wallet_verified: true, message: "Wallet sudah terverifikasi" });
-      if (payment.status !== "pending" || new Date(payment.expires_at).getTime() < Date.now()) {
-        throw new Error("Permintaan pembayaran sudah kedaluwarsa. Buat permintaan baru.");
+      const paymentWallet = rawAddress(payment.wallet_address).toLowerCase();
+      const currentWallet = user.wallet_address
+        ? rawAddress(user.wallet_address).toLowerCase()
+        : null;
+
+      if (user.wallet_verified === true && currentWallet === paymentWallet) {
+        return json({ success: true, wallet_verified: true, message: "Wallet sudah terverifikasi" });
+      }
+
+      if (payment.status === "verified") {
+        if (currentWallet === paymentWallet) {
+          const { data: walletLock, error: walletLockError } = await supabase
+            .from("dcx_wallet_identity_locks")
+            .select("wallet_address, telegram_id, verified_at, transaction_hash")
+            .eq("wallet_address", paymentWallet)
+            .maybeSingle();
+          if (walletLockError) throw walletLockError;
+          if (walletLock && String(walletLock.telegram_id) === telegramId) {
+            const { error: restoreError } = await supabase.from(TABLE).update({
+              wallet_verified: true,
+              wallet_verified_at: walletLock.verified_at,
+              wallet_verification_tx_hash: walletLock.transaction_hash,
+            }).eq("telegram_id", telegramId);
+            if (restoreError) throw restoreError;
+            const latest = await getUser(telegramId);
+            const wallet = await refreshUserBalance(latest);
+            return json({
+              success: true,
+              wallet_verified: true,
+              wallet,
+              message: "Wallet verified milik akun ini berhasil dipulihkan.",
+            });
+          }
+        }
+        throw new Error("Pembayaran ini sudah selesai dan tidak dapat digunakan ulang oleh akun atau wallet lain.");
+      }
+
+      if (user.wallet_verified === true) {
+        throw new Error("Akun ini sudah terikat pada wallet verified lain.");
+      }
+      if (payment.status !== "pending") {
+        throw new Error("Permintaan pembayaran tidak lagi berstatus pending.");
       }
       if (rawAddress(user.wallet_address || "") !== rawAddress(payment.wallet_address)) {
         throw new Error("Wallet akun berubah. Buat permintaan verifikasi baru.");
       }
       const txHash = await findPaymentTransaction(payment);
       if (!txHash) {
+        const expiresAt = new Date(payment.expires_at).getTime();
+        if (Number.isFinite(expiresAt) && Date.now() > expiresAt) {
+          const { error: expireError } = await supabase
+            .from("wallet_verification_payments")
+            .update({ status: "rejected" })
+            .eq("id", payment.id)
+            .eq("status", "pending");
+          if (expireError) throw expireError;
+          return json({
+            success: false,
+            pending: false,
+            expired: true,
+            message: "Verification request expired. Please start a new request.",
+          }, 410);
+        }
         return json({ success: false, pending: true, message: "Transaksi belum ditemukan atau belum final. Tunggu sebentar lalu periksa kembali." }, 202);
       }
       const { data: confirmed, error: confirmError } = await supabase.rpc("confirm_wallet_verification", {
