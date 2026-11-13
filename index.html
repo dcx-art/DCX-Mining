@@ -742,10 +742,10 @@ input:focus{
   <p class="small wallet-help">Choose Tonkeeper or Telegram Wallet in the secure TON Connect wallet selector. Your wallet address will be added automatically after you approve the connection.</p>
   <p class="small" id="walletStatusMessage">Connect your TON wallet address to continue.</p>
   <div id="walletPaymentPanel" style="display:none">
-    <div class="notice">Wallet verification costs 0.07 TON on TON Mainnet. This fee is non-refundable. TON network fees may be additional. Only continue if you agree.</div>
+    <div class="notice">Wallet verification costs 0.09 TON on TON Mainnet. This fee is non-refundable. TON network fees may be additional. Only continue if you agree.</div>
     <button class="secondary" id="beginWalletVerificationBtn" onclick="beginWalletVerification()">CONTINUE TO VERIFICATION</button>
     <div id="walletPaymentDetails" style="display:none">
-      <p class="small">Your connected wallet will ask you to confirm the 0.07 TON payment. After submission, DCX checks the transaction automatically.</p>
+      <p class="small">Your connected wallet will ask you to confirm the verification payment amount. After submission, DCX checks the transaction automatically.</p>
       <p class="small" id="walletPaymentExpiry"></p>
       <button id="checkWalletPaymentBtn" onclick="verifyWalletPayment()">CHECK PAYMENT STATUS</button>
     </div>
@@ -1242,7 +1242,7 @@ async function initializeTonConnect() {
 }
 
 async function beginWalletVerification() {
-  const agreed = confirm('Wallet verification requires a non-refundable payment of exactly 0.07 TON on TON Mainnet to the official DCX receiver. TON network fees may be additional. Do you agree to continue?');
+  const agreed = confirm('The current wallet verification fee is 0.09 TON on TON Mainnet. The fee is non-refundable; TON network fees may be additional. Do you agree to continue?');
   if (!agreed) return;
   const button = document.getElementById('beginWalletVerificationBtn');
   button.disabled = true;
@@ -1263,7 +1263,7 @@ async function beginWalletVerification() {
     document.getElementById('walletPaymentExpiry').textContent = 'Payment request expires: ' + new Date(result.expires_at).toLocaleString();
     document.getElementById('walletPaymentDetails').style.display = 'block';
     document.getElementById('walletPaymentPanel').style.display = 'block';
-    document.getElementById('walletStatusMessage').textContent = 'Opening your connected wallet. Review the receiver and exact 0.07 TON amount there.';
+    document.getElementById('walletStatusMessage').textContent = 'Opening your connected wallet. Review the receiver and exact amount shown in your connected wallet.';
 
     await tonConnectUI.sendTransaction({
       validUntil: Math.floor(Date.now() / 1000) + 300,
@@ -1413,7 +1413,7 @@ async function loadWalletStatus() {
         document.getElementById('walletPaymentExpiry').textContent = 'Existing payment request: ' + new Date(pending.expires_at).toLocaleString();
         document.getElementById('walletPaymentDetails').style.display = 'block';
         document.getElementById('beginWalletVerificationBtn').style.display = 'none';
-        message.textContent = 'Your previous 0.07 TON payment request was found. DCX is checking that transaction now. Do not pay again.';
+        message.textContent = 'Your previous wallet verification payment request was found. DCX is checking that transaction now. Do not pay again.';
         startWalletPaymentAutoCheck();
         verifyWalletPayment(true);
       } else {
