@@ -1061,6 +1061,41 @@ async function dcxWithdrawApi(action, extra = {}) {
   return result;
 }
 
+let dcxWithdrawalCountdownTimer = null;
+
+function dcxCountdownText(deadline) {
+  const remaining = Math.max(0, Math.floor((deadline - Date.now()) / 1000));
+  const hours = Math.floor(remaining / 3600);
+  const minutes = Math.floor((remaining % 3600) / 60);
+  const seconds = remaining % 60;
+  return [hours, minutes, seconds].map(value => String(value).padStart(2, '0')).join(':');
+}
+
+function dcxStartWithdrawalCountdowns() {
+  if (dcxWithdrawalCountdownTimer) clearInterval(dcxWithdrawalCountdownTimer);
+  const update = () => {
+    document.querySelectorAll('[data-dcx-countdown]').forEach(node => {
+      const deadline = new Date(node.dataset.deadline).getTime();
+      if (!Number.isFinite(deadline)) {
+        node.textContent = 'Time unavailable';
+        return;
+      }
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) {
+        node.textContent = node.dataset.kind === 'payment'
+          ? '24-hour processing window has elapsed. Please contact DCX admin.'
+          : 'You may submit a new withdrawal request now.';
+      } else {
+        node.textContent = dcxCountdownText(deadline);
+      }
+    });
+  };
+  update();
+  if (document.querySelector('[data-dcx-countdown]')) {
+    dcxWithdrawalCountdownTimer = setInterval(update, 1000);
+  }
+}
+
 async function dcxLoadMyWithdrawals() {
   const button=document.getElementById('dcxRefreshMyWithdrawalsBtn');
   const message=document.getElementById('dcxMyWithdrawalsMessage');
@@ -1069,6 +1104,10 @@ async function dcxLoadMyWithdrawals() {
   button.disabled=true;
   message.textContent='Loading your withdrawal history...';
   list.replaceChildren();
+  if (dcxWithdrawalCountdownTimer) {
+    clearInterval(dcxWithdrawalCountdownTimer);
+    dcxWithdrawalCountdownTimer = null;
+  }
   try{
     const result=await dcxWithdrawApi('my_requests');
     const requests=Array.isArray(result.requests)?result.requests:[];
@@ -1077,15 +1116,38 @@ async function dcxLoadMyWithdrawals() {
       return;
     }
     message.textContent=requests.length+' recent request(s).';
-    requests.forEach(request=>{
+    requests.forEach((request,index)=>{
       const card=document.createElement('div');
       card.className='level';
+      const createdAt = new Date(request.created_at);
+      const deadline = new Date(createdAt.getTime() + 24 * 60 * 60 * 1000);
+      const status = String(request.status||'').toLowerCase();
       card.append(
         dcxAdminText('b','Request #'+request.id),
         dcxAdminText('p','Amount: '+request.amount_dcx+' DCX','margin:7px 0'),
-        dcxAdminText('p','Status: '+String(request.status||'').toUpperCase(),'margin:7px 0'),
-        dcxAdminText('p','Submitted: '+new Date(request.created_at).toLocaleString(),'margin:7px 0')
+        dcxAdminText('p','Status: '+status.toUpperCase(),'margin:7px 0'),
+        dcxAdminText('p','Submitted: '+createdAt.toLocaleString(),'margin:7px 0')
       );
+      if(status === 'pending' || status === 'processing'){
+        card.append(
+          dcxAdminText('p','Payment processing time remaining (24-hour limit):','margin:10px 0 4px'),
+          dcxAdminText('b','', 'display:block;color:#42e8ff;font-size:19px;font-variant-numeric:tabular-nums')
+        );
+        const paymentTimer = card.lastElementChild;
+        paymentTimer.dataset.dcxCountdown = '1';
+        paymentTimer.dataset.deadline = deadline.toISOString();
+        paymentTimer.dataset.kind = 'payment';
+      }
+      if(index === 0){
+        card.append(
+          dcxAdminText('p','Next withdrawal request available in:','margin:12px 0 4px'),
+          dcxAdminText('b','', 'display:block;color:#f5c76b;font-size:19px;font-variant-numeric:tabular-nums')
+        );
+        const nextTimer = card.lastElementChild;
+        nextTimer.dataset.dcxCountdown = '1';
+        nextTimer.dataset.deadline = deadline.toISOString();
+        nextTimer.dataset.kind = 'next';
+      }
       if(request.transaction_hash){
         card.append(dcxAdminText('p','TON transaction: '+request.transaction_hash,'font-size:10px;overflow-wrap:anywhere;word-break:break-all'));
       }
@@ -1094,13 +1156,13 @@ async function dcxLoadMyWithdrawals() {
       }
       list.append(card);
     });
+    dcxStartWithdrawalCountdowns();
   }catch(error){
     message.textContent=error.message||'Unable to load your withdrawal history.';
   }finally{
     button.disabled=false;
   }
 }
-
 async function dcxLoadAdminTools() {
   try {
     const result = await dcxWithdrawApi('admin_check');
