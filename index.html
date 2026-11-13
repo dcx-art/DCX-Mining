@@ -374,6 +374,77 @@ button.secondary{
   0%,100%{transform:scale(1);filter:brightness(1)}
   50%{transform:scale(1.035);filter:brightness(1.12)}
 }
+
+/* DCX electric energy orbit — decorative layer only */
+.orb{
+  position:relative;
+  isolation:isolate;
+  overflow:visible;
+  border-color:#9275ff;
+}
+.orb::before,
+.orb::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  border-radius:50%;
+  border:3px solid transparent;
+  background-clip:padding-box,border-box;
+  -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude;
+}
+.orb::before{
+  inset:-11px;
+  background:
+    linear-gradient(transparent,transparent) padding-box,
+    conic-gradient(from 0deg,
+      transparent 0deg 34deg,
+      #20dcff 42deg,
+      #ffffff 47deg,
+      #5b7dff 53deg,
+      transparent 62deg 154deg,
+      #20dcff 164deg,
+      #ffffff 169deg,
+      #9364ff 176deg,
+      transparent 185deg 278deg,
+      #20dcff 288deg,
+      #ffffff 294deg,
+      #9364ff 301deg,
+      transparent 310deg 360deg) border-box;
+  filter:drop-shadow(0 0 4px #20dcff) drop-shadow(0 0 9px #526dff);
+  animation:dcxElectricOrbit 3.2s linear infinite;
+}
+.orb::after{
+  inset:-6px;
+  border-width:2px;
+  background:
+    linear-gradient(transparent,transparent) padding-box,
+    conic-gradient(from 150deg,
+      transparent 0deg 205deg,
+      #4cecff 214deg,
+      #ffffff 219deg,
+      #8a72ff 226deg,
+      transparent 236deg 360deg) border-box;
+  filter:drop-shadow(0 0 5px #20dcff) drop-shadow(0 0 12px #8a72ff);
+  animation:dcxElectricOrbitReverse 1.9s linear infinite;
+}
+.dcx-logo{
+  position:relative;
+  z-index:1;
+}
+@keyframes dcxElectricOrbit{
+  to{transform:rotate(360deg)}
+}
+@keyframes dcxElectricOrbitReverse{
+  to{transform:rotate(-360deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .orb::before,.orb::after{animation:none}
+}
+
 #mineBtn{
   color:#17120a;
   border:1px solid #fff0a7;
