@@ -912,7 +912,11 @@ async function verifyWalletPayment(silent = false) {
     }
   } catch (error) {
     const message = error.message || 'Unable to verify payment.';
-    if (/kedaluwarsa|expired/i.test(message)) clearWalletPayment();
+    if (/kedaluwarsa|expired/i.test(message)) {
+      clearWalletPayment();
+      document.getElementById('walletPaymentDetails').style.display = 'none';
+      document.getElementById('beginWalletVerificationBtn').style.display = 'block';
+    }
     document.getElementById('walletStatusMessage').textContent = message;
   } finally {
     walletPaymentCheckBusy = false;
