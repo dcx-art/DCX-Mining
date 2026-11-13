@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>DCX Mining — Telegram Mini App Demo</title>
+<title>DCX Mining — Cyber Digital</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root{
@@ -252,6 +252,166 @@ margin-top:12px;
   display: none !important;
 }
 </style>
+
+<style id="dcx-cyber-theme">
+:root{
+  --bg:#050817;
+  --panel:#0b1530;
+  --panel2:#080f24;
+  --text:#edf5ff;
+  --muted:#91a8cb;
+  --gold:#ffd45e;
+  --gold2:#fff0ae;
+  --cyan:#20dcff;
+  --line:#254a83;
+  --violet:#9364ff;
+}
+html{background:#050817}
+body{
+  position:relative;
+  isolation:isolate;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(25,104,255,.28),transparent 42%),
+    radial-gradient(ellipse at 90% 35%,rgba(112,55,255,.13),transparent 36%),
+    linear-gradient(180deg,#050817 0%,#07132b 48%,#040713 100%);
+  color:var(--text);
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.17;
+  background-image:
+    linear-gradient(rgba(32,220,255,.22) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(32,220,255,.22) 1px,transparent 1px);
+  background-size:30px 30px;
+  mask-image:linear-gradient(to bottom,black,transparent 88%);
+}
+.wrap{position:relative;z-index:1}
+.top{margin-bottom:15px}
+.brand{
+  color:#f4f8ff;
+  letter-spacing:2px;
+  text-shadow:0 0 14px rgba(32,220,255,.38);
+}
+.brand span{color:var(--cyan)}
+.pill{
+  border:1px solid rgba(147,100,255,.7);
+  color:#d9ceff;
+  background:linear-gradient(135deg,rgba(34,46,94,.9),rgba(15,22,49,.95));
+  box-shadow:0 0 16px rgba(112,75,255,.18),inset 0 0 12px rgba(32,220,255,.06);
+}
+.card{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(145deg,rgba(13,29,63,.96),rgba(6,13,32,.98));
+  border:1px solid rgba(39,153,255,.58);
+  border-radius:19px;
+  box-shadow:0 12px 32px rgba(0,0,0,.38),0 0 18px rgba(0,153,255,.09),inset 0 1px 0 rgba(140,220,255,.08);
+}
+.card:before{
+  content:"";
+  position:absolute;
+  left:14px;right:14px;top:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(32,220,255,.8),rgba(147,100,255,.65),transparent);
+  pointer-events:none;
+}
+.label{color:#8faed8;letter-spacing:1.35px}
+.balance{
+  color:var(--gold2);
+  text-shadow:0 0 18px rgba(255,207,73,.24);
+}
+.token{color:var(--gold)}
+.stat{
+  background:linear-gradient(145deg,rgba(13,38,78,.92),rgba(7,17,39,.98));
+  border:1px solid rgba(41,139,226,.55);
+  box-shadow:inset 0 0 18px rgba(25,140,255,.06);
+}
+.stat b{color:#43dcff;text-shadow:0 0 12px rgba(32,220,255,.2)}
+button{
+  border:1px solid #41cfff;
+  color:#f5fbff;
+  background:linear-gradient(110deg,#0757c8,#087fe9 55%,#493bcb);
+  box-shadow:0 0 16px rgba(0,143,255,.28),inset 0 1px 0 rgba(255,255,255,.24);
+}
+button.secondary{
+  color:#dcecff;
+  border:1px solid rgba(70,145,226,.65);
+  background:linear-gradient(145deg,#102b55,#0a1733);
+  box-shadow:inset 0 0 14px rgba(32,220,255,.05);
+}
+.tabs button.active{
+  color:#fff;
+  border-color:#72eaff;
+  background:linear-gradient(110deg,#0878e8,#443ad1);
+  box-shadow:0 0 18px rgba(32,220,255,.35),inset 0 1px 0 rgba(255,255,255,.25);
+}
+.tabs button.secondary{color:#b8cce9}
+.mining{
+  background:
+    radial-gradient(ellipse at 50% 35%,rgba(0,142,255,.15),transparent 48%),
+    linear-gradient(145deg,rgba(10,27,59,.98),rgba(5,12,29,.99));
+}
+.orb{
+  width:174px;height:174px;
+  border:2px solid #25dfff;
+  background:radial-gradient(circle,rgba(19,65,123,.75),rgba(7,18,43,.96) 68%);
+  box-shadow:0 0 12px rgba(32,220,255,.72),0 0 34px rgba(32,116,255,.4),inset 0 0 28px rgba(32,220,255,.2);
+}
+.orb.active{
+  border-color:#8a72ff;
+  box-shadow:0 0 15px rgba(32,220,255,.9),0 0 42px rgba(108,75,255,.5),inset 0 0 30px rgba(32,220,255,.24);
+  animation:dcxCyberPulse 2.2s ease-in-out infinite;
+}
+.dcx-logo{
+  width:150px;height:150px;
+  filter:drop-shadow(0 0 13px rgba(27,179,255,.62));
+}
+@keyframes dcxCyberPulse{
+  0%,100%{transform:scale(1);filter:brightness(1)}
+  50%{transform:scale(1.035);filter:brightness(1.12)}
+}
+#mineBtn{
+  color:#17120a;
+  border:1px solid #fff0a7;
+  background:linear-gradient(100deg,#e5a928,#ffe36e 52%,#ffbd32);
+  box-shadow:0 0 18px rgba(255,197,55,.32),inset 0 1px 0 rgba(255,255,255,.55);
+  text-shadow:none;
+}
+#mineBtn:disabled{opacity:.65;filter:saturate(.65)}
+#status{color:#62f5ad}
+#earned{color:#e8f7ff;text-shadow:0 0 16px rgba(32,220,255,.25)}
+#timer{color:#a8c5e8}
+.level{
+  background:linear-gradient(145deg,#0b1d40,#071329);
+  border-color:rgba(45,136,218,.55);
+}
+.level.current{border-color:#9275ff;box-shadow:0 0 16px rgba(120,91,255,.2)}
+input{
+  background:#050d20;
+  border-color:rgba(57,143,218,.65);
+  color:#f3f8ff;
+}
+.notice{
+  background:rgba(44,34,16,.76);
+  border-color:rgba(255,199,83,.55);
+  color:#ffe6a8;
+}
+.small{color:#9bb2d3}
+@media(max-width:520px){
+  body{padding:8px 9px 18px}
+  .card{border-radius:17px;padding:16px}
+  .orb{width:166px;height:166px}
+  .dcx-logo{width:144px;height:144px}
+}
+@media(prefers-reduced-motion:reduce){
+  .orb.active{animation:none}
+}
+</style>
+
 </head>
 <body><div class="wrap">
 <header class="top"><div class="brand">DCX <span>MINING</span></div><div class="pill" id="userTag">DCX Demo</div></header>
