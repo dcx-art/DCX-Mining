@@ -988,6 +988,7 @@ async function loadWalletStatus() {
   button.disabled = true;
   try {
     const result = await walletRequest('status');
+    button.style.display = result.wallet_verified ? 'block' : 'none';
     document.getElementById('walletVerifyStatus').textContent = result.wallet_verified ? 'VERIFIED' : (result.wallet_address ? 'CONNECTED — NOT VERIFIED' : 'NOT CONNECTED');
     document.getElementById('walletVerificationNotice').style.display = result.wallet_verified ? 'none' : 'block';
     document.getElementById('walletAddressText').textContent = result.wallet_address ? formatTonFriendlyAddress(result.wallet_address) : 'No wallet connected yet.';
@@ -1023,6 +1024,7 @@ async function loadWalletStatus() {
       message.textContent = 'Connect your TON wallet address to continue.';
     }
   } catch (error) {
+    button.style.display = 'none';
     message.textContent = error.message || 'Unable to load wallet status.';
     document.getElementById('walletVerifyStatus').textContent = 'UNAVAILABLE';
     document.getElementById('walletAddressText').textContent = 'Wallet status could not be loaded.';
