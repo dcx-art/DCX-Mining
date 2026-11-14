@@ -673,6 +673,17 @@ input:focus{
 .withdraw-rules-panel .notice{margin-top:8px}
 </style>
 
+
+<style id="dcx-compact-withdraw-history">
+.dcx-withdraw-request-card{
+  padding:10px 12px !important;
+  margin:7px 0 !important;
+  border-radius:12px !important;
+  box-shadow:0 5px 14px rgba(0,0,0,.22),0 0 10px rgba(0,153,255,.05) !important;
+}
+.dcx-withdraw-request-card p{overflow-wrap:anywhere}
+</style>
+
 </head>
 <body><div class="wrap">
 <header class="top"><div class="brand">DCX <span>MINING</span></div><div class="pill" id="userTag">DCX Demo</div></header>
@@ -1566,20 +1577,20 @@ async function dcxLoadMyWithdrawals() {
     message.textContent=requests.length+' recent request(s).';
     requests.forEach((request,index)=>{
       const card=document.createElement('div');
-      card.className='level';
+      card.className='level dcx-withdraw-request-card';
       const createdAt = new Date(request.created_at);
       const deadline = new Date(createdAt.getTime() + 24 * 60 * 60 * 1000);
       const status = String(request.status||'').toLowerCase();
       card.append(
-        dcxAdminText('b','Request #'+request.id),
-        dcxAdminText('p','Amount: '+request.amount_dcx+' DCX','margin:7px 0'),
-        dcxAdminText('p','Status: '+status.toUpperCase(),'margin:7px 0'),
-        dcxAdminText('p','Submitted: '+createdAt.toLocaleString(),'margin:7px 0')
+        dcxAdminText('b','Request #'+request.id,'display:block;font-size:13px;line-height:1.3;margin:0 0 5px'),
+        dcxAdminText('p','Amount: '+request.amount_dcx+' DCX','margin:3px 0;font-size:11px;line-height:1.4'),
+        dcxAdminText('p','Status: '+status.toUpperCase(),'margin:3px 0;font-size:11px;line-height:1.4'),
+        dcxAdminText('p','Submitted: '+createdAt.toLocaleString(),'margin:3px 0;font-size:11px;line-height:1.4')
       );
       if(index === 0){
         card.append(
-          dcxAdminText('p','Payment Processing & Next Withdrawal Request','margin:12px 0 4px'),
-          dcxAdminText('b','', 'display:block;color:#42e8ff;font-size:20px;font-variant-numeric:tabular-nums')
+          dcxAdminText('p','Payment Processing & Next Withdrawal Request','margin:8px 0 3px;font-size:10px;line-height:1.35;color:#91a8cb'),
+          dcxAdminText('b','', 'display:block;color:#42e8ff;font-size:15px;line-height:1.3;font-variant-numeric:tabular-nums')
         );
         const countdown = card.lastElementChild;
         countdown.dataset.dcxCountdown = '1';
