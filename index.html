@@ -1581,10 +1581,18 @@ async function dcxLoadMyWithdrawals() {
       const createdAt = new Date(request.created_at);
       const deadline = new Date(createdAt.getTime() + 24 * 60 * 60 * 1000);
       const status = String(request.status||'').toLowerCase();
+      const statusLine = document.createElement('p');
+      statusLine.style.cssText = 'margin:1px 0;font-size:8px;line-height:1.2';
+      statusLine.append(document.createTextNode('Status: '));
+      const statusColor = status === 'processing' ? '#ffd45e'
+        : status === 'rejected' ? '#ff626f'
+        : status === 'completed' ? '#43f5a5'
+        : '#edf5ff';
+      statusLine.append(dcxAdminText('b',status.toUpperCase(),'color:'+statusColor+';font-weight:900'));
       card.append(
         dcxAdminText('b','Request #'+request.id,'display:block;font-size:10px;line-height:1.15;margin:0 0 2px'),
         dcxAdminText('p','Amount: '+request.amount_dcx+' DCX','margin:1px 0;font-size:8px;line-height:1.2'),
-        dcxAdminText('p','Status: '+status.toUpperCase(),'margin:1px 0;font-size:8px;line-height:1.2'),
+        statusLine,
         dcxAdminText('p','Submitted: '+createdAt.toLocaleString(),'margin:1px 0;font-size:8px;line-height:1.2')
       );
       if(index === 0){
