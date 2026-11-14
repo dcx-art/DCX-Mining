@@ -808,7 +808,6 @@ input:focus{
   <p class="small wallet-help">Choose Tonkeeper or Telegram Wallet in the secure TON Connect wallet selector. Your wallet address will be added automatically after you approve the connection.</p>
   <p class="small" id="walletStatusMessage">Connect your TON wallet address to continue.</p>
   <div id="walletPaymentPanel" style="display:none">
-    <div class="notice">Wallet verification costs 0.09 TON on TON Mainnet. This fee is non-refundable. TON network fees may be additional. Only continue if you agree.</div>
     <button class="secondary" id="beginWalletVerificationBtn" onclick="beginWalletVerification()">CONTINUE TO VERIFICATION</button>
     <div id="walletPaymentDetails" style="display:none">
       <p class="small">Your connected wallet will ask you to confirm the verification payment amount. After submission, DCX checks the transaction automatically.</p>
@@ -1335,7 +1334,7 @@ async function initializeTonConnect() {
 }
 
 async function beginWalletVerification() {
-  const agreed = confirm('The current wallet verification fee is 0.09 TON on TON Mainnet. The fee is non-refundable; TON network fees may be additional. Do you agree to continue?');
+  const agreed = confirm('Wallet verification costs 0.09 TON on TON Mainnet.\n\nVerification helps minimize bot abuse and protect the ecosystem as it continues to grow.\n\nContinue only if you agree.');
   if (!agreed) return;
   const button = document.getElementById('beginWalletVerificationBtn');
   button.disabled = true;
