@@ -654,6 +654,25 @@ input:focus{
 
 </style>
 
+
+<style id="dcx-withdraw-rules-style">
+.withdraw-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.withdraw-heading h3{margin:0}
+.withdraw-rules-toggle{
+  width:42px;height:42px;min-width:42px;padding:9px;margin:0;
+  display:grid;place-items:center;border-radius:12px;
+  background:linear-gradient(145deg,#102b55,#0a1733);
+  border:1px solid rgba(70,190,255,.8);
+  box-shadow:0 0 14px rgba(32,220,255,.18);
+}
+.withdraw-rules-toggle svg{width:22px;height:22px;fill:none;stroke:#9cecff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.withdraw-rules-toggle[aria-expanded="true"]{border-color:#ffd45e;box-shadow:0 0 15px rgba(255,212,94,.2)}
+.withdraw-rules-toggle[aria-expanded="true"] svg{stroke:#ffe6a6}
+.withdraw-rules-panel{padding:1px 0 3px}
+.withdraw-rules-panel[hidden]{display:none}
+.withdraw-rules-panel .notice{margin-top:8px}
+</style>
+
 </head>
 <body><div class="wrap">
 <header class="top"><div class="brand">DCX <span>MINING</span></div><div class="pill" id="userTag">DCX Demo</div></header>
@@ -758,7 +777,23 @@ input:focus{
   <button class="secondary" id="refreshWalletStatusBtn" onclick="refreshWalletBalance()">REFRESH DCX HOLDING & LEVEL</button>
   <div class="notice" id="walletVerificationNotice" style="display:none">NO VERIFIED WALLET, NO MINING. Mining access will be enabled only after wallet verification succeeds.</div>
 </div>
-<div class="card"><h3>Withdraw</h3><div class="notice"><b>Withdrawal rules</b><br>Minimum withdrawal: 10,000 DCX.<br>Maximum withdrawal: No limit, subject to your available DCX balance.<br>Request limit: Only 1 withdrawal request in every 24-hour period.<br>Processing time: Within 24 hours after a valid request is submitted.</div><div class="small">Manual processing: your request will be reviewed by the DCX admin and paid to your verified TON wallet within 24 hours. Payment is sent manually from the DCX Payout Wallet.</div><label class="label">Withdrawal Amount (DCX)</label><div class="withdraw-input-row"><input id="amount" type="number" min="10000" step="0.000000001" placeholder="Minimum 10,000 DCX"><button type="button" class="max-btn" onclick="setMaxWithdraw()">MAX</button></div><button id="submitWithdrawBtn" onclick="withdraw()">SUBMIT WITHDRAWAL REQUEST</button><p id="wdmsg" class="small"></p><div class="notice">Your verified TON wallet will be used as the withdrawal destination. Never share your seed phrase or private key.</div></div>
+<div class="card">
+  <div class="withdraw-heading">
+    <h3>Withdraw</h3>
+    <button type="button" class="withdraw-rules-toggle" id="dcxWithdrawRulesToggle" aria-label="Show withdrawal rules" aria-expanded="false" aria-controls="dcxWithdrawRulesPanel" onclick="toggleDcxWithdrawRules()">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c2.8-.8 5.4-.4 8 1.2v13c-2.6-1.6-5.2-2-8-1.2z"></path><path d="M20 5.5c-2.8-.8-5.4-.4-8 1.2v13c2.6-1.6 5.2-2 8-1.2z"></path><path d="M12 6.7v13"></path></svg>
+    </button>
+  </div>
+  <div id="dcxWithdrawRulesPanel" class="withdraw-rules-panel" hidden>
+    <div class="notice"><b>Withdrawal rules</b><br>Minimum withdrawal: 10,000 DCX.<br>Maximum withdrawal: No limit, subject to your available DCX balance.<br>Request limit: Only 1 withdrawal request in every 24-hour period.<br>Processing time: Within 24 hours after a valid request is submitted.</div>
+    <div class="notice">Your verified TON wallet will be used as the withdrawal destination. Never share your seed phrase or private key.</div>
+  </div>
+  <div class="small">Manual processing: your request will be reviewed by the DCX admin and paid to your verified TON wallet within 24 hours. Payment is sent manually from the DCX Payout Wallet.</div>
+  <label class="label">Withdrawal Amount (DCX)</label>
+  <div class="withdraw-input-row"><input id="amount" type="number" min="10000" step="0.000000001" placeholder="Minimum 10,000 DCX"><button type="button" class="max-btn" onclick="setMaxWithdraw()">MAX</button></div>
+  <button id="submitWithdrawBtn" onclick="withdraw()">SUBMIT WITHDRAWAL REQUEST</button>
+  <p id="wdmsg" class="small"></p>
+</div>
 <div class="card"><h3>My Withdrawal Requests</h3><button class="secondary" id="dcxRefreshMyWithdrawalsBtn" onclick="dcxLoadMyWithdrawals()">REFRESH MY REQUESTS</button><p class="small" id="dcxMyWithdrawalsMessage">Your withdrawal history will appear here.</p><div id="dcxMyWithdrawalsList"></div></div>
 <div class="card" id="dcxAdminTestPanel" style="display:none">
   <h3>DCX Admin Tools</h3>
@@ -776,6 +811,17 @@ input:focus{
 <div class="notice" id="prototypeNotice">Prototype front-end gratis. Data saldo disimpan di browser perangkat ini dan mudah diubah; jangan gunakan untuk uang sungguhan.</div>
 </div>
 <script>
+
+function toggleDcxWithdrawRules(){
+  const panel=document.getElementById('dcxWithdrawRulesPanel');
+  const button=document.getElementById('dcxWithdrawRulesToggle');
+  if(!panel||!button)return;
+  const willOpen=panel.hidden;
+  panel.hidden=!willOpen;
+  button.setAttribute('aria-expanded',String(willOpen));
+  button.setAttribute('aria-label',willOpen?'Hide withdrawal rules':'Show withdrawal rules');
+}
+
 const MINING_API='https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/mining-api';
 const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();let u=tg.initDataUnsafe?.user;if(u)document.getElementById('userTag').textContent=u.first_name||'Telegram user';}
 const params = new URLSearchParams(location.search);
