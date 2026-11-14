@@ -61,6 +61,28 @@ font-size:11px;
 text-transform:uppercase;
 letter-spacing:1.5px;
 }
+.balance-heading{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:8px;
+}
+.dex-listing{
+flex:0 0 auto;
+padding:5px 9px;
+border:1px solid rgba(245,199,107,.55);
+border-radius:9px;
+background:linear-gradient(135deg,#20243a,#111a2c);
+color:#d8e3f5;
+font-size:10px;
+font-weight:800;
+letter-spacing:.55px;
+white-space:nowrap;
+}
+.dex-listing span{
+color:#43f5a5;
+text-shadow:0 0 8px rgba(67,245,165,.35);
+}
 .balance{
 font-size:36px;
 font-weight:900;
@@ -688,7 +710,10 @@ input:focus{
 <body><div class="wrap">
 <header class="top"><div class="brand">DCX <span>MINING</span></div><div class="pill" id="userTag">DCX Demo</div></header>
 <div class="card">
-  <div class="label">TOTAL BALANCE</div>
+  <div class="balance-heading">
+    <div class="label">TOTAL BALANCE</div>
+    <div class="dex-listing">DEX LISTING: <span>SOON</span></div>
+  </div>
   <div class="balance">
     <span id="balance">0.0000</span>
     <span class="token">DCX</span>
