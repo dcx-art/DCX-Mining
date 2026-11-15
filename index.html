@@ -752,33 +752,8 @@ input:focus{
 <style id="dcx-lightning-effect-style">.orb{position:relative;isolation:isolate;overflow:visible}.dcx-lightning-effect{position:absolute;inset:-5%;z-index:4;pointer-events:none;opacity:0;transform:scale(.88);filter:drop-shadow(0 0 8px rgba(156,255,211,.95))}.dcx-lightning-effect>svg:first-child{display:block;width:100%;height:100%;overflow:visible}.dcx-bolts{stroke:#d9fff0;stroke-width:3.1;opacity:.15}.dcx-electric-ring{stroke:#aaffd6;opacity:.12;filter:drop-shadow(0 0 5px #aaffd6)}.dcx-lightning-effect.dcx-lightning-active{animation:dcxLightningBurst 2.15s ease-out both}.dcx-lightning-active .dcx-bolts{animation:dcxBoltFlash 2.15s steps(1,end) both}.dcx-lightning-active .dcx-electric-ring{animation:dcxRingFlash 2.15s ease-out both}@keyframes dcxLightningBurst{0%{opacity:0;transform:scale(.78)}8%{opacity:1;transform:scale(1.08)}18%{opacity:.35;transform:scale(1)}29%{opacity:1;transform:scale(1.04)}43%{opacity:.22;transform:scale(1)}58%{opacity:.95;transform:scale(1.02)}100%{opacity:0;transform:scale(1.16)}}9%{opacity:1;stroke-dashoffset:0;transform:scale(1.04)}19%{opacity:.12;stroke-dashoffset:-25;transform:scale(1.08)}31%{opacity:1;stroke-dashoffset:0;transform:scale(1.12)}46%{opacity:.18;stroke-dashoffset:-35;transform:scale(1.16)}61%{opacity:.9;stroke-dashoffset:0;transform:scale(1.2)}100%{opacity:0;stroke-dashoffset:-70;transform:scale(1.28)}}@keyframes dcxBoltFlash{0%,100%{opacity:0}8%,17%,29%,38%,58%,67%{opacity:1}18%,39%,68%{opacity:.12}}@keyframes dcxRingFlash{0%,100%{opacity:0;stroke-width:1}8%,28%,58%{opacity:1;stroke-width:4}18%,42%{opacity:.18;stroke-width:2}}@media(prefers-reduced-motion:reduce){.dcx-lightning-effect.dcx-lightning-active,.dcx-lightning-active .dcx-bolts,.dcx-lightning-active .dcx-electric-ring{animation-duration:.01ms}}</style>
 <style id="dcx-official-link-style">
 .dcx-official-top{
-  position:absolute;
-  top:12px;
   left:14px;
-  z-index:5;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:auto;
-  margin:0;
-  padding:7px 10px;
-  min-height:32px;
-  border:1px solid rgba(255,211,103,.8);
-  border-radius:10px;
-  color:#ffe7a1;
-  background:linear-gradient(135deg,#18385e,#10213e);
-  box-shadow:0 0 13px rgba(255,196,64,.16);
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.45px;
-  line-height:1.2;
-  text-decoration:none;
-  white-space:nowrap;
-  -webkit-tap-highlight-color:transparent;
-}
-.dcx-official-top:active{
-  transform:scale(.98);
-  box-shadow:0 0 17px rgba(255,196,64,.25);
+  right:auto;
 }
 </style>
 </head>
@@ -829,7 +804,7 @@ input:focus{
 </div>
 <div class="tabs"><button class="active" onclick="tab('mine',this)">⛏ Mining</button><button class="secondary" onclick="tab('ref',this)">♧ Referral</button><button class="secondary" onclick="tab('level',this)">⚡ Level</button><button class="secondary" onclick="tab('wd',this)">↗ Withdraw</button></div>
 <section id="mine" class="section show">
-<div class="card mining"><a class="dcx-official-top" href="https://t.me/dcxchanel" target="_blank" rel="noopener noreferrer">OFFICIAL DCX</a><button type="button" class="dcx-checkin-top" onclick="openDailyCheckin()">CHECK IN</button><div class="orb" id="orb">
+<div class="card mining"><a class="dcx-checkin-top dcx-official-top" href="https://t.me/dcxchanel" target="_blank" rel="noopener noreferrer">OFFICIAL DCX</a><button type="button" class="dcx-checkin-top" onclick="openDailyCheckin()">CHECK IN</button><div class="orb" id="orb">
   <img src="https://dcx-art.github.io/DCX-Mining/dcx-coin.png?v=2"
        class="dcx-logo" alt="DCX Coin">
   <div class="dcx-lightning-effect" id="dcxLightningEffect" aria-hidden="true"><svg viewBox="0 0 200 200" role="presentation"><defs><filter id="dcxBoltGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g class="dcx-bolts" filter="url(#dcxBoltGlow)" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M100 5 L91 30 L101 27 L88 55 L109 31 L100 34 L111 8"/><path d="M195 100 L170 91 L173 101 L145 88 L169 109 L166 100 L192 111"/><path d="M100 195 L109 170 L99 173 L112 145 L91 169 L100 166 L89 192"/><path d="M5 100 L30 109 L27 99 L55 112 L31 91 L34 100 L8 89"/><path d="M33 31 L53 47 L49 51 L76 68 L58 44 L54 48 L37 28"/><path d="M169 31 L153 53 L149 49 L132 76 L156 58 L152 54 L172 37"/><path d="M169 169 L147 153 L151 149 L124 132 L142 156 L146 152 L164 172"/><path d="M31 169 L47 147 L51 151 L68 124 L44 142 L48 146 L28 164"/></g><circle class="dcx-electric-ring" cx="100" cy="100" r="91" fill="none" stroke="#c9ffe9" stroke-width="2.5"/></svg></div>
