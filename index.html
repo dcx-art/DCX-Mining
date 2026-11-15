@@ -795,7 +795,7 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
 </script>
 </head>
 <body><div class="wrap">
-<header class="top"><div class="brand">DCX <span>MINING</span></div><div class="dcx-top-actions"><div class="pill" id="userTag">DCX Demo</div></div></header>
+<header class="top"><div class="brand">DCX <span>MINING</span></div><div class="dcx-top-actions"><div class="pill" id="userTag">DCX Demo</div><button type="button" class="dcx-language-trigger" id="dcxLanguageTrigger" onclick="openDcxLanguage()">🌐 EN</button></div></header>
  
 <div class="dcx-checkin-modal" id="dcxDailyCheckinModal" hidden onclick="if(event.target===this)closeDailyCheckin()">
   <div class="dcx-checkin-panel" role="dialog" aria-modal="true" aria-labelledby="dcxCheckinTitle">
@@ -2054,11 +2054,7 @@ dcxLoadAdminTools();
  let selected=localStorage.getItem(key)||'en';
  const grid=document.getElementById('dcxLanguageGrid');
  const modal=document.getElementById('dcxLanguageModal');
- const trigger=document.createElement('button');
- trigger.type='button';trigger.className='dcx-language-trigger';trigger.id='dcxLanguageTrigger';
- trigger.textContent='🌐 '+(langs.find(x=>x[0]===selected)?.[2]||'English');
- trigger.onclick=openDcxLanguage;
- document.querySelector('.dcx-top-actions')?.appendChild(trigger);
+ const trigger=document.getElementById('dcxLanguageTrigger');
  function render(){
   grid.innerHTML='';
   langs.forEach(([code,flag,name])=>{
