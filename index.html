@@ -1686,6 +1686,7 @@ async function loadWalletStatus() {
     const result = await walletRequest('status');
     button.style.display = result.wallet_verified ? 'block' : 'none';
     document.getElementById('walletVerifyStatus').textContent = result.admin_exempt ? 'ADMIN — EXEMPT' : (result.wallet_verified ? 'VERIFIED' : (result.wallet_address ? 'CONNECTED — NOT VERIFIED' : 'NOT CONNECTED'));
+     document.getElementById('walletVerifyStatus').style.color = result.wallet_verified ? '#43f5a5' : '';
     document.getElementById('walletVerificationNotice').style.display = (!result.wallet_verified && !result.admin_exempt && miningLocked) ? 'block' : 'none';
     document.getElementById('walletAddressText').textContent = result.wallet_address ? formatTonFriendlyAddress(result.wallet_address) : (result.admin_exempt ? 'Wallet verification is not required for admin mining.' : 'No wallet connected yet.');
     document.getElementById('walletLevel').textContent = 'Level ' + Number(result.level || 1);
