@@ -1395,7 +1395,8 @@ function formatDcx(value) {
 async function loadLevelRules() {
   const list = document.getElementById('levelRulesList');
   if (!list) return;
-  const verified = document.getElementById('walletVerifyStatus')?.textContent === 'VERIFIED';
+  const walletStatus = document.getElementById('walletVerifyStatus')?.textContent;
+  const verified = walletStatus === 'VERIFIED' || walletStatus === 'ADMIN — EXEMPT';
   if (!verified) {
     document.getElementById('levelIntro').textContent = 'Verify your TON wallet to activate your level information.';
     document.getElementById('levelCurrent').textContent = '—';
@@ -1408,7 +1409,7 @@ async function loadLevelRules() {
     const result = await walletRequest('level_rules');
     const currentLevel = Number(document.getElementById('walletLevel')?.textContent.replace(/[^0-9]/g, '') || 1);
     const holding = Number((document.getElementById('walletHolding')?.textContent || '0').replace(/,/g, '').replace(/[^0-9.]/g, '') || 0);
-    document.getElementById('levelIntro').textContent = 'Your wallet is verified. Explore all 100 DCX levels and their daily rewards.';
+    document.getElementById('levelIntro').textContent = walletStatus === 'ADMIN — EXEMPT' ? 'Admin account: wallet verification is not required for mining. Explore all 100 DCX levels.' : 'Your wallet is verified. Explore all 100 DCX levels and their daily rewards.';
     document.getElementById('levelCurrent').textContent = 'Level ' + currentLevel;
     document.getElementById('levelHolding').textContent = formatDcx(holding) + ' DCX';
     document.getElementById('levelListMessage').textContent = (result.rules || []).length + ' levels · Sorted from Level 1 to Level 100 · Daily reward includes base and bonus.';
@@ -1626,16 +1627,20 @@ async function loadWalletStatus() {
   try {
     const result = await walletRequest('status');
     button.style.display = result.wallet_verified ? 'block' : 'none';
-    document.getElementById('walletVerifyStatus').textContent = result.wallet_verified ? 'VERIFIED' : (result.wallet_address ? 'CONNECTED — NOT VERIFIED' : 'NOT CONNECTED');
-    document.getElementById('walletVerificationNotice').style.display = result.wallet_verified ? 'none' : 'block';
-    document.getElementById('walletAddressText').textContent = result.wallet_address ? formatTonFriendlyAddress(result.wallet_address) : 'No wallet connected yet.';
+    document.getElementById('walletVerifyStatus').textContent = result.admin_exempt ? 'ADMIN — EXEMPT' : (result.wallet_verified ? 'VERIFIED' : (result.wallet_address ? 'CONNECTED — NOT VERIFIED' : 'NOT CONNECTED'));
+    document.getElementById('walletVerificationNotice').style.display = (result.wallet_verified || result.admin_exempt) ? 'none' : 'block';
+    document.getElementById('walletAddressText').textContent = result.wallet_address ? formatTonFriendlyAddress(result.wallet_address) : (result.admin_exempt ? 'Wallet verification is not required for admin mining.' : 'No wallet connected yet.');
     document.getElementById('walletLevel').textContent = 'Level ' + Number(result.level || 1);
     document.getElementById('walletHolding').textContent = Number(result.wallet_balance_dcx || 0).toLocaleString('en-US') + ' DCX';
     if (result.wallet_verified) loadLevelRules();
     document.getElementById('walletCheckedAt').textContent = result.wallet_balance_checked_at ? 'Last checked: ' + new Date(result.wallet_balance_checked_at).toLocaleString() : 'DCX holding has not been checked yet.';
-    document.getElementById('walletPaymentPanel').style.display = result.wallet_address && !result.wallet_verified ? 'block' : 'none';
-    document.getElementById('beginWalletVerificationBtn').style.display = result.wallet_verified ? 'none' : 'block';
-    if (result.wallet_verified) {
+    document.getElementById('walletPaymentPanel').style.display = !result.admin_exempt && result.wallet_address && !result.wallet_verified ? 'block' : 'none';
+    document.getElementById('beginWalletVerificationBtn').style.display = (result.wallet_verified || result.admin_exempt) ? 'none' : 'block';
+    if (result.admin_exempt) {
+      document.getElementById('walletPaymentDetails').style.display = 'none';
+      message.textContent = 'Admin account: wallet verification is not required for mining. Connect a TON wallet only if you need wallet-based features.';
+      loadLevelRules();
+    } else if (result.wallet_verified) {
       message.textContent = 'Wallet verified successfully.';
       document.getElementById('walletPaymentDetails').style.display = 'none';
       clearWalletPayment();
