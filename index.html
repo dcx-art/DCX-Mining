@@ -2136,7 +2136,8 @@ dcxLoadAdminTools();
  document.addEventListener('DOMContentLoaded',apply);
  window.addEventListener('dcx-language-changed',apply);
  const observer=new MutationObserver(records=>records.forEach(record=>{
-  if(record.type==='characterData')translateNode(record.target,true);\n  if(record.type==='attributes')translateAttributes(record.target);
+  if(record.type==='characterData')translateNode(record.target,true);
+  if(record.type==='attributes')translateAttributes(record.target);
   record.addedNodes?.forEach(node=>{if(node.nodeType===Node.TEXT_NODE)translateNode(node);else if(node.nodeType===Node.ELEMENT_NODE){scan(node);translateAttributes(node);}});
  }));
  observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['placeholder','title','aria-label']});
