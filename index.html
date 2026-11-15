@@ -2101,16 +2101,16 @@ dcxLoadAdminTools();
  fa:{'TOTAL BALANCE':'موجودی کل','Your DCX mining assets':'دارایی‌های استخراج DCX شما','MINING SPEED':'سرعت استخراج','MINING STATUS':'وضعیت استخراج','Inactive':'غیرفعال','Mining session':'جلسه استخراج','Mining belum dimulai':'استخراج هنوز آغاز نشده است','MULAI MINING':'شروع استخراج','Referral Program':'برنامه دعوت','Your Referral Link':'پیوند دعوت شما','COPY REFERRAL LINK':'کپی پیوند دعوت','TOTAL REFERRALS':'مجموع دعوت‌ها','UNCLAIMED REWARDS':'پاداش‌های دریافت‌نشده','Claimed Rewards':'پاداش‌های دریافت‌شده','Pending Wallet Verification':'در انتظار تأیید کیف پول','CLAIM REWARD':'دریافت پاداش','DCX Mining Levels':'سطوح استخراج DCX','YOUR LEVEL':'سطح شما','VERIFIED HOLDING':'موجودی تأییدشده','Wallet Connection & Verification':'اتصال و تأیید کیف پول','Wallet Status':'وضعیت کیف پول','Checking...':'در حال بررسی...','No wallet connected yet.':'هنوز کیف پولی متصل نشده است.','CONNECT WALLET':'اتصال کیف پول','CONTINUE TO VERIFICATION':'ادامه تأیید','CHECK PAYMENT STATUS':'بررسی وضعیت پرداخت','Withdrawal rules':'قوانین برداشت','Withdrawal Amount (DCX)':'مقدار برداشت (DCX)','SUBMIT WITHDRAWAL REQUEST':'ثبت درخواست برداشت','My Withdrawal Requests':'درخواست‌های برداشت من','REFRESH MY REQUESTS':'تازه‌سازی درخواست‌ها','OFFICIAL DCX':'DCX رسمی','CHECK IN':'حضور روزانه'},
  bn:{'TOTAL BALANCE':'মোট ব্যালেন্স','Your DCX mining assets':'আপনার DCX মাইনিং সম্পদ','MINING SPEED':'মাইনিং গতি','MINING STATUS':'মাইনিং অবস্থা','Inactive':'নিষ্ক্রিয়','Mining session':'মাইনিং সেশন','Mining belum dimulai':'মাইনিং শুরু হয়নি','MULAI MINING':'মাইনিং শুরু করুন','Referral Program':'রেফারেল প্রোগ্রাম','Your Referral Link':'আপনার রেফারেল লিংক','COPY REFERRAL LINK':'রেফারেল লিংক কপি করুন','TOTAL REFERRALS':'মোট রেফারেল','UNCLAIMED REWARDS':'দাবি না করা পুরস্কার','Claimed Rewards':'দাবি করা পুরস্কার','Pending Wallet Verification':'ওয়ালেট যাচাই অপেক্ষমাণ','CLAIM REWARD':'পুরস্কার নিন','DCX Mining Levels':'DCX মাইনিং লেভেল','YOUR LEVEL':'আপনার লেভেল','VERIFIED HOLDING':'যাচাইকৃত ব্যালেন্স','Wallet Connection & Verification':'ওয়ালেট সংযোগ ও যাচাই','Wallet Status':'ওয়ালেটের অবস্থা','Checking...':'পরীক্ষা করা হচ্ছে...','No wallet connected yet.':'এখনও কোনো ওয়ালেট সংযুক্ত নেই।','CONNECT WALLET':'ওয়ালেট সংযুক্ত করুন','CONTINUE TO VERIFICATION':'যাচাই চালিয়ে যান','CHECK PAYMENT STATUS':'পেমেন্টের অবস্থা দেখুন','Withdrawal rules':'উত্তোলনের নিয়ম','Withdrawal Amount (DCX)':'উত্তোলনের পরিমাণ (DCX)','SUBMIT WITHDRAWAL REQUEST':'উত্তোলনের অনুরোধ জমা দিন','My Withdrawal Requests':'আমার উত্তোলনের অনুরোধ','REFRESH MY REQUESTS':'অনুরোধ রিফ্রেশ করুন','OFFICIAL DCX':'অফিশিয়াল DCX','CHECK IN':'দৈনিক চেক-ইন'}
  };
- const original=new WeakMap();
+ const original=new WeakMap(),lastApplied=new WeakMap();
  let applying=false;
- function translateNode(node){
+ function translateNode(node,externalChange=false){
   if(applying||node.nodeType!==Node.TEXT_NODE)return;
-  const raw=original.get(node)??node.nodeValue;
-  if(!original.has(node))original.set(node,raw);
-  const key=raw.trim();
+  if(!original.has(node)|| (externalChange&&node.nodeValue!==lastApplied.get(node)))original.set(node,node.nodeValue);
+  const raw=original.get(node),key=raw.trim();
   const lang=window.getDcxLanguage?window.getDcxLanguage():'en';
   const value=(data[lang]&&data[lang][key])||data.en[key]||raw;
   if(node.nodeValue!==value){applying=true;node.nodeValue=value;applying=false;}
+  lastApplied.set(node,value);
  }
  function scan(root){
   const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
@@ -2120,7 +2120,7 @@ dcxLoadAdminTools();
  document.addEventListener('DOMContentLoaded',apply);
  window.addEventListener('dcx-language-changed',apply);
  const observer=new MutationObserver(records=>records.forEach(record=>{
-  if(record.type==='characterData')translateNode(record.target);
+  if(record.type==='characterData')translateNode(record.target,true);
   record.addedNodes?.forEach(node=>{if(node.nodeType===Node.TEXT_NODE)translateNode(node);else if(node.nodeType===Node.ELEMENT_NODE)scan(node);});
  }));
  observer.observe(document.body,{subtree:true,childList:true,characterData:true});
