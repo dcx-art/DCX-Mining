@@ -717,9 +717,62 @@ input:focus{
 .dcx-withdraw-request-card p{overflow-wrap:anywhere}
 </style>
 
+ 
+<style id="dcx-daily-checkin-style">
+.dcx-top-actions{display:flex;align-items:center;gap:8px}
+.dcx-checkin-top{width:auto!important;margin:0!important;padding:9px 12px!important;border-radius:12px!important;font-size:11px!important;font-weight:800;letter-spacing:.5px;color:#ffe7a1!important;background:linear-gradient(135deg,#18385e,#10213e)!important;border:1px solid rgba(255,211,103,.8)!important;box-shadow:0 0 13px rgba(255,196,64,.16)}
+.dcx-checkin-modal[hidden]{display:none!important}
+.dcx-checkin-modal{position:fixed;inset:0;z-index:99999;background:rgba(2,7,18,.82);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:14px}
+.dcx-checkin-panel{width:min(100%,460px);max-height:90vh;overflow:auto;background:linear-gradient(160deg,#14233c,#091322 75%);border:1px solid rgba(79,190,255,.38);border-radius:20px;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.55),0 0 25px rgba(44,180,255,.10);color:#eef5ff}
+.dcx-checkin-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.dcx-checkin-head h3{margin:0;font-size:17px}
+.dcx-checkin-kicker{font-size:10px;letter-spacing:1.5px;color:#8ddfff;font-weight:800;margin-bottom:4px}
+.dcx-checkin-close{width:34px!important;height:34px!important;min-width:34px!important;padding:0!important;margin:0!important;border-radius:10px!important;background:#1b2b43!important;color:#d9e8ff!important;font-size:21px!important}
+.dcx-checkin-hero{padding:18px 12px;text-align:center;border-radius:16px;background:radial-gradient(circle at top,#1e4970,#10213b 72%);border:1px solid rgba(93,196,255,.25)}
+.dcx-checkin-hero .day{font-size:12px;letter-spacing:1.2px;color:#a8dfff;font-weight:800}
+.dcx-checkin-hero strong{display:block;font-size:30px;line-height:1.25;margin:8px 0;color:#ffdc82;text-shadow:0 0 14px rgba(255,205,90,.22)}
+.dcx-checkin-hero p{font-size:12px;color:#c5d5e8;margin:0}
+.dcx-checkin-progress{height:8px;background:#263a55;border-radius:99px;overflow:hidden;margin:14px 0 7px}
+.dcx-checkin-progress>div{height:100%;width:0;background:linear-gradient(90deg,#37d6e9,#ffd36b);border-radius:99px;transition:width .25s}
+.dcx-checkin-progress-label{display:flex;justify-content:space-between;color:#9db0c9;font-size:10px;margin-bottom:12px}
+.dcx-checkin-days{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:12px 0}
+.dcx-checkin-day{padding:7px 2px;text-align:center;border-radius:8px;background:#14243a;border:1px solid #263a55;color:#9eb1c9;font-size:10px}
+.dcx-checkin-day b{display:block;font-size:11px;color:#dceaff;margin-bottom:2px}
+.dcx-checkin-day.done{background:#123d3b;border-color:#287d70;color:#8af0c5}
+.dcx-checkin-day.done b{color:#9af5ce}
+.dcx-checkin-day.current{border-color:#f3c75d;background:#3a301c;color:#ffe39a;box-shadow:0 0 9px rgba(255,211,103,.12)}
+.dcx-checkin-day.current b{color:#ffe39a}
+.dcx-checkin-claim{margin:8px 0 4px!important;width:100%!important}
+.dcx-checkin-claim:disabled{opacity:.58;filter:saturate(.5)}
+.dcx-checkin-message{min-height:18px;text-align:center;font-size:11px;color:#b8cbe1;margin:8px 0}
+.dcx-checkin-reset{text-align:center;color:#8095b2;font-size:10px;margin:8px 0 0}
+@media(max-width:380px){.dcx-top-actions{gap:5px}.dcx-checkin-top{padding:8px 9px!important;font-size:10px!important}.dcx-checkin-panel{padding:14px}.dcx-checkin-days{gap:4px}}
+</style>
+
 </head>
 <body><div class="wrap">
-<header class="top"><div class="brand">DCX <span>MINING</span></div><div class="pill" id="userTag">DCX Demo</div></header>
+<header class="top"><div class="brand">DCX <span>MINING</span></div><div class="dcx-top-actions"><button type="button" class="dcx-checkin-top" onclick="openDailyCheckin()">CHECK IN</button><div class="pill" id="userTag">DCX Demo</div></div></header>
+ 
+<div class="dcx-checkin-modal" id="dcxDailyCheckinModal" hidden onclick="if(event.target===this)closeDailyCheckin()">
+  <div class="dcx-checkin-panel" role="dialog" aria-modal="true" aria-labelledby="dcxCheckinTitle">
+    <div class="dcx-checkin-head">
+      <div><div class="dcx-checkin-kicker">DCX REWARDS</div><h3 id="dcxCheckinTitle">Daily Check-in</h3></div>
+      <button type="button" class="dcx-checkin-close" aria-label="Close" onclick="closeDailyCheckin()">×</button>
+    </div>
+    <div class="dcx-checkin-hero">
+      <div class="day" id="dcxCheckinDay">DAY 1 / 30</div>
+      <strong id="dcxCheckinReward">10 DCX</strong>
+      <p id="dcxCheckinStatusText">Claim your daily reward.</p>
+    </div>
+    <div class="dcx-checkin-progress"><div id="dcxCheckinProgressBar"></div></div>
+    <div class="dcx-checkin-progress-label"><span id="dcxCheckinProgressText">0 of 30 days completed</span><span>30 DAYS</span></div>
+    <div class="dcx-checkin-days" id="dcxCheckinDays"></div>
+    <button type="button" class="dcx-checkin-claim" id="dcxClaimDailyBtn" onclick="claimDailyCheckin()">CLAIM DAILY REWARD</button>
+    <p class="dcx-checkin-message" id="dcxCheckinMessage"></p>
+    <p class="dcx-checkin-reset">Daily reset: 00:00 UTC</p>
+  </div>
+</div>
+
 <div class="card">
   <div class="balance-heading">
     <div class="label">TOTAL BALANCE</div>
@@ -901,6 +954,90 @@ async function miningRequest(action){
   if(!response.ok) throw new Error(result.error||'Koneksi mining gagal');
   return result;
 }
+
+ 
+function dailyCheckinRewardForDay(day){
+  if(day>=1&&day<=9)return 10;
+  if(day===10)return 100;
+  if(day>=11&&day<=19)return 15;
+  if(day===20)return 200;
+  if(day>=21&&day<=29)return 20;
+  if(day===30)return 300;
+  return 10;
+}
+function openDailyCheckin(){
+  const modal=document.getElementById('dcxDailyCheckinModal');
+  modal.hidden=false;
+  document.body.style.overflow='hidden';
+  refreshDailyCheckin();
+}
+function closeDailyCheckin(){
+  const modal=document.getElementById('dcxDailyCheckinModal');
+  modal.hidden=true;
+  document.body.style.overflow='';
+}
+async function refreshDailyCheckin(){
+  const claimBtn=document.getElementById('dcxClaimDailyBtn');
+  const message=document.getElementById('dcxCheckinMessage');
+  claimBtn.disabled=true;
+  message.textContent='Loading your check-in status...';
+  try{
+    const result=await miningRequest('daily_checkin_status');
+    const day=Number(result.day_number||1);
+    const reward=Number(result.reward||dailyCheckinRewardForDay(day));
+    const completed=Number(result.completed_days||0);
+    const claimed=Boolean(result.claimed_today);
+    document.getElementById('dcxCheckinDay').textContent='DAY '+day+' / 30';
+    document.getElementById('dcxCheckinReward').textContent=reward.toLocaleString('en-US')+' DCX';
+    document.getElementById('dcxCheckinStatusText').textContent=claimed?'Today\'s reward has been claimed.':'Claim today\'s reward to continue your 30-day streak.';
+    document.getElementById('dcxCheckinProgressBar').style.width=(Math.min(30,completed)/30*100)+'%';
+    document.getElementById('dcxCheckinProgressText').textContent=completed+' of 30 days completed';
+    const days=document.getElementById('dcxCheckinDays');
+    days.innerHTML='';
+    for(let n=1;n<=30;n++){
+      const tile=document.createElement('div');
+      tile.className='dcx-checkin-day'+(n<=completed?' done':'')+(n===day&&!claimed?' current':'');
+      const label=document.createElement('b');
+      label.textContent='DAY '+n;
+      const amount=document.createElement('span');
+      amount.textContent=dailyCheckinRewardForDay(n)+' DCX';
+      tile.append(label,amount);
+      days.appendChild(tile);
+    }
+    claimBtn.disabled=claimed;
+    claimBtn.textContent=claimed?'CHECK-IN COMPLETED':'CLAIM DAILY REWARD';
+    message.textContent=claimed?'You have already checked in today. Come back after 00:00 UTC.':'Your daily reward is ready to claim.';
+  }catch(error){
+    message.textContent=error.message||'Unable to load Daily Check-in.';
+    claimBtn.disabled=true;
+  }
+}
+async function claimDailyCheckin(){
+  const button=document.getElementById('dcxClaimDailyBtn');
+  const message=document.getElementById('dcxCheckinMessage');
+  button.disabled=true;
+  message.textContent='Processing your daily reward...';
+  try{
+    const result=await miningRequest('claim_daily_checkin');
+    if(!result.success){
+      await refreshDailyCheckin();
+      message.textContent=result.code==='ALREADY_CLAIMED'?'You have already checked in today.':'Daily Check-in is not available right now.';
+      return;
+    }
+    await refreshMining();
+    await refreshDailyCheckin();
+    message.textContent='Success! '+Number(result.reward||0).toLocaleString('en-US')+' DCX added to your balance.';
+  }catch(error){
+    message.textContent=error.message||'Daily Check-in failed. Please try again.';
+    button.disabled=false;
+  }
+}
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'){
+    const modal=document.getElementById('dcxDailyCheckinModal');
+    if(modal&&!modal.hidden)closeDailyCheckin();
+  }
+});
 
 async function refreshMining(){
   const result=await miningRequest('status');console.log('STATUS MINING:',result);
