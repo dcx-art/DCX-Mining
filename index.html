@@ -2021,5 +2021,69 @@ async function dcxTestTelegramNotification() {
 dcxLoadAdminTools();
 </script>
 
+
+<style id="dcx-language-style">
+.dcx-language-trigger{width:auto!important;min-width:42px;padding:6px 9px!important;margin:0 0 0 7px!important;border-radius:10px!important;font-size:11px!important;background:linear-gradient(145deg,#102b55,#0a1733)!important;border:1px solid rgba(67,255,155,.55)!important;color:#e9fff4!important}
+.dcx-language-modal[hidden]{display:none!important}
+.dcx-language-modal{position:fixed;inset:0;z-index:100001;background:rgba(2,7,18,.84);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:14px}
+.dcx-language-panel{width:min(100%,440px);max-height:88vh;overflow:auto;background:linear-gradient(160deg,#14233c,#091322 78%);border:1px solid rgba(67,255,155,.48);border-radius:18px;padding:16px;box-shadow:0 20px 70px #0009;color:#eef5ff}
+.dcx-language-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.dcx-language-head h3{margin:0;font-size:17px}
+.dcx-language-close{width:34px!important;height:34px!important;min-width:34px!important;padding:0!important;margin:0!important;border-radius:9px!important;font-size:20px!important}
+.dcx-language-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dcx-language-option{display:flex;align-items:center;gap:9px;text-align:left;width:100%;padding:11px!important;border-radius:11px!important;font-size:12px!important;background:linear-gradient(145deg,#102b55,#0a1733)!important;border:1px solid rgba(67,255,155,.22)!important;color:#eaf5ff!important}
+.dcx-language-option.selected{border-color:#75ffb0!important;box-shadow:0 0 12px #43ff9b33}
+.dcx-language-option span:first-child{font-size:19px}
+.dcx-language-note{font-size:10px;color:#9bb2d3;margin:12px 2px 0;line-height:1.5}
+</style>
+<div class="dcx-language-modal" id="dcxLanguageModal" hidden onclick="if(event.target===this)closeDcxLanguage()">
+ <div class="dcx-language-panel" role="dialog" aria-modal="true" aria-labelledby="dcxLanguageTitle">
+  <div class="dcx-language-head"><h3 id="dcxLanguageTitle">Choose Language</h3><button class="dcx-language-close" type="button" onclick="closeDcxLanguage()">×</button></div>
+  <div class="dcx-language-grid" id="dcxLanguageGrid"></div>
+  <p class="dcx-language-note" id="dcxLanguageNote">Your language choice is saved on this device. More interface translations will be added in stages.</p>
+ </div>
+</div>
+<script id="dcx-language-system">
+(function(){
+ const langs=[
+  ['en','🇬🇧','English'],['id','🇮🇩','Indonesia'],['ru','🇷🇺','Русский'],['uk','🇺🇦','Українська'],['es','🇪🇸','Español'],
+  ['pt','🇵🇹','Português'],['fr','🇫🇷','Français'],['de','🇩🇪','Deutsch'],['tr','🇹🇷','Türkçe'],['hi','🇮🇳','हिन्दी'],
+  ['zh','🇨🇳','中文'],['vi','🇻🇳','Tiếng Việt'],['ar','🇸🇦','العربية'],['fa','🇮🇷','فارسی'],['bn','🇧🇩','বাংলা']
+ ];
+ const key='dcxMiniAppLanguage';
+ let selected=localStorage.getItem(key)||'en';
+ const grid=document.getElementById('dcxLanguageGrid');
+ const modal=document.getElementById('dcxLanguageModal');
+ const trigger=document.createElement('button');
+ trigger.type='button';trigger.className='dcx-language-trigger';trigger.id='dcxLanguageTrigger';
+ trigger.textContent='🌐 '+(langs.find(x=>x[0]===selected)?.[2]||'English');
+ trigger.onclick=openDcxLanguage;
+ document.querySelector('.dcx-top-actions')?.appendChild(trigger);
+ function render(){
+  grid.innerHTML='';
+  langs.forEach(([code,flag,name])=>{
+   const b=document.createElement('button');b.type='button';
+   b.className='dcx-language-option'+(selected===code?' selected':'');
+   b.innerHTML='<span>'+flag+'</span><span>'+name+'</span>';
+   b.onclick=()=>chooseDcxLanguage(code);
+   grid.appendChild(b);
+  });
+  trigger.textContent='🌐 '+(langs.find(x=>x[0]===selected)?.[2]||'English');
+ }
+ window.openDcxLanguage=()=>{render();modal.hidden=false};
+ window.closeDcxLanguage=()=>{modal.hidden=true};
+ window.chooseDcxLanguage=(code)=>{
+  if(!langs.some(x=>x[0]===code))return;
+  selected=code;localStorage.setItem(key,code);render();
+  document.documentElement.lang=code;
+  modal.hidden=true;
+  window.dispatchEvent(new CustomEvent('dcx-language-changed',{detail:{language:code}}));
+ };
+ window.getDcxLanguage=()=>selected;
+ document.documentElement.lang=selected;
+ render();
+})();
+</script>
+
 </body>
 </html>
