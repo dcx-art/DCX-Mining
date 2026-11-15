@@ -954,6 +954,16 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
 </div>
 <div class="card"><h3>My Withdrawal Requests</h3><button class="secondary" id="dcxRefreshMyWithdrawalsBtn" onclick="dcxLoadMyWithdrawals()">REFRESH MY REQUESTS</button><p class="small" id="dcxMyWithdrawalsMessage">Your withdrawal history will appear here.</p><div id="dcxMyWithdrawalsList"></div></div>
 <div class="card" id="dcxAdminTestPanel" style="display:none">
+  <h3>DCX ADMIN STATISTICS</h3>
+  <div class="stats" style="margin:12px 0">
+    <div class="stat"><div class="label">TOTAL USERS</div><b id="dcxAdminTotalUsers">—</b></div>
+    <div class="stat"><div class="label">NEW USERS TODAY</div><b id="dcxAdminNewToday">—</b></div>
+    <div class="stat"><div class="label">NEW USERS · 7 DAYS</div><b id="dcxAdminNewWeek">—</b></div>
+    <div class="stat"><div class="label">VERIFIED WALLETS</div><b id="dcxAdminVerifiedWallets">—</b></div>
+  </div>
+  <button class="secondary" id="dcxRefreshAdminStatsBtn" onclick="dcxLoadAdminStats()">REFRESH STATISTICS</button>
+  <p class="small" id="dcxAdminStatsUpdated">Statistics are available to authorized admins only.</p>
+  <hr style="border:0;border-top:1px solid #344968;margin:18px 0">
   <h3>DCX Admin Tools</h3>
   <p class="small">Send a safe test message to your Telegram admin account. This will not create a withdrawal request or change any DCX balance.</p>
   <button class="secondary" id="dcxTestTelegramBtn" onclick="dcxTestTelegramNotification()">TEST TELEGRAM NOTIFICATION</button>
@@ -1862,12 +1872,33 @@ async function dcxLoadMyWithdrawals() {
     button.disabled=false;
   }
 }
+async function dcxLoadAdminStats() {
+  const button = document.getElementById('dcxRefreshAdminStatsBtn');
+  const message = document.getElementById('dcxAdminStatsUpdated');
+  if (!button || !message) return;
+  button.disabled = true;
+  message.textContent = 'Loading admin statistics...';
+  try {
+    const result = await dcxWithdrawApi('admin_stats');
+    const stats = result.stats || {};
+    document.getElementById('dcxAdminTotalUsers').textContent = Number(stats.total_users || 0).toLocaleString('en-US');
+    document.getElementById('dcxAdminNewToday').textContent = Number(stats.new_users_today || 0).toLocaleString('en-US');
+    document.getElementById('dcxAdminNewWeek').textContent = Number(stats.new_users_7d || 0).toLocaleString('en-US');
+    document.getElementById('dcxAdminVerifiedWallets').textContent = Number(stats.verified_wallets || 0).toLocaleString('en-US');
+    message.textContent = 'Last updated: ' + new Date(stats.generated_at || Date.now()).toLocaleString();
+  } catch (error) {
+    message.textContent = error.message || 'Unable to load admin statistics.';
+  } finally {
+    button.disabled = false;
+  }
+}
+
 async function dcxLoadAdminTools() {
   try {
     const result = await dcxWithdrawApi('admin_check');
     if (result.is_admin) {
       document.getElementById('dcxAdminTestPanel').style.display = 'block';
-      await dcxLoadWithdrawals();
+      await Promise.all([dcxLoadAdminStats(), dcxLoadWithdrawals()]);
     }
   } catch (_) {
     // Non-admin users do not see the admin-only panel.
