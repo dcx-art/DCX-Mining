@@ -720,7 +720,7 @@ input:focus{
  
 <style id="dcx-daily-checkin-style">
 .dcx-top-actions{display:flex;align-items:center;gap:8px}
-.dcx-checkin-top{width:auto!important;margin:0!important;padding:9px 12px!important;border-radius:12px!important;font-size:11px!important;font-weight:800;letter-spacing:.5px;color:#ffe7a1!important;background:linear-gradient(135deg,#18385e,#10213e)!important;border:1px solid rgba(255,211,103,.8)!important;box-shadow:0 0 13px rgba(255,196,64,.16)}
+.mining{position:relative;padding-top:42px!important}.dcx-checkin-top{position:absolute;top:12px;right:14px;width:auto!important;margin:0!important;padding:7px 10px!important;border-radius:10px!important;font-size:9px!important;font-weight:800;letter-spacing:.45px;color:#ffe7a1!important;background:linear-gradient(135deg,#18385e,#10213e)!important;border:1px solid rgba(255,211,103,.8)!important;box-shadow:0 0 13px rgba(255,196,64,.16);z-index:5}
 .dcx-checkin-modal[hidden]{display:none!important}
 .dcx-checkin-modal{position:fixed;inset:0;z-index:99999;background:rgba(2,7,18,.82);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:14px}
 .dcx-checkin-panel{width:min(100%,460px);max-height:90vh;overflow:auto;background:linear-gradient(160deg,#14233c,#091322 75%);border:1px solid rgba(79,190,255,.38);border-radius:20px;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.55),0 0 25px rgba(44,180,255,.10);color:#eef5ff}
@@ -746,12 +746,12 @@ input:focus{
 .dcx-checkin-claim:disabled{opacity:.58;filter:saturate(.5)}
 .dcx-checkin-message{min-height:18px;text-align:center;font-size:11px;color:#b8cbe1;margin:8px 0}
 .dcx-checkin-reset{text-align:center;color:#8095b2;font-size:10px;margin:8px 0 0}
-@media(max-width:380px){.dcx-top-actions{gap:5px}.dcx-checkin-top{padding:8px 9px!important;font-size:10px!important}.dcx-checkin-panel{padding:14px}.dcx-checkin-days{gap:4px}}
+@media(max-width:380px){.dcx-checkin-top{top:10px;right:11px;padding:6px 8px!important;font-size:8px!important}.dcx-checkin-panel{padding:14px}.dcx-checkin-days{gap:4px}}
 </style>
 
 </head>
 <body><div class="wrap">
-<header class="top"><div class="brand">DCX <span>MINING</span></div><div class="dcx-top-actions"><button type="button" class="dcx-checkin-top" onclick="openDailyCheckin()">CHECK IN</button><div class="pill" id="userTag">DCX Demo</div></div></header>
+<header class="top"><div class="brand">DCX <span>MINING</span></div><div class="dcx-top-actions"><div class="pill" id="userTag">DCX Demo</div></div></header>
  
 <div class="dcx-checkin-modal" id="dcxDailyCheckinModal" hidden onclick="if(event.target===this)closeDailyCheckin()">
   <div class="dcx-checkin-panel" role="dialog" aria-modal="true" aria-labelledby="dcxCheckinTitle">
@@ -797,7 +797,7 @@ input:focus{
 </div>
 <div class="tabs"><button class="active" onclick="tab('mine',this)">⛏ Mining</button><button class="secondary" onclick="tab('ref',this)">♧ Referral</button><button class="secondary" onclick="tab('level',this)">⚡ Level</button><button class="secondary" onclick="tab('wd',this)">↗ Withdraw</button></div>
 <section id="mine" class="section show">
-<div class="card mining"><div class="orb" id="orb">
+<div class="card mining"><button type="button" class="dcx-checkin-top" onclick="openDailyCheckin()">CHECK IN</button><div class="orb" id="orb">
   <img src="https://dcx-art.github.io/DCX-Mining/dcx-coin.png?v=2"
        class="dcx-logo" alt="DCX Coin">
 </div><div class="label">Mining session</div><h2 id="earned">0.0000 DCX</h2><div class="small" id="timer">Mining belum dimulai</div><div style="margin-top:15px"><button id="mineBtn" onclick="toggleMine()">MULAI MINING</button></div></div></section>
