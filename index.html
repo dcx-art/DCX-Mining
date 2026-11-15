@@ -938,6 +938,7 @@ function render(){
   document.getElementById('orb').classList.toggle('active',active);
   document.getElementById('mineBtn').textContent=miningLocked?'VERIFY WALLET FIRST':(active?'CLAIM DCX':'START MINING');
   document.getElementById('mineBtn').disabled=miningLocked;
+  document.getElementById('walletVerificationNotice').style.display=miningLocked?'block':'none';
   document.getElementById('earned').textContent=Math.min(dailyReward,pendingReward).toFixed(4)+' DCX';
   document.getElementById('timer').textContent=miningLocked?'Wallet verification required. Please visit Withdraw.':(active?'Mining Active Since'+new Date(startAt).toLocaleString('id-ID'):'Mining Not Started');
 }
@@ -1628,7 +1629,7 @@ async function loadWalletStatus() {
     const result = await walletRequest('status');
     button.style.display = result.wallet_verified ? 'block' : 'none';
     document.getElementById('walletVerifyStatus').textContent = result.admin_exempt ? 'ADMIN — EXEMPT' : (result.wallet_verified ? 'VERIFIED' : (result.wallet_address ? 'CONNECTED — NOT VERIFIED' : 'NOT CONNECTED'));
-    document.getElementById('walletVerificationNotice').style.display = (result.wallet_verified || result.admin_exempt) ? 'none' : 'block';
+    document.getElementById('walletVerificationNotice').style.display = (!result.wallet_verified && !result.admin_exempt && miningLocked) ? 'block' : 'none';
     document.getElementById('walletAddressText').textContent = result.wallet_address ? formatTonFriendlyAddress(result.wallet_address) : (result.admin_exempt ? 'Wallet verification is not required for admin mining.' : 'No wallet connected yet.');
     document.getElementById('walletLevel').textContent = 'Level ' + Number(result.level || 1);
     document.getElementById('walletHolding').textContent = Number(result.wallet_balance_dcx || 0).toLocaleString('en-US') + ' DCX';
