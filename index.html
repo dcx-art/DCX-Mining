@@ -991,7 +991,7 @@ let dailyReward=100, rate=dailyReward/24;
 document.getElementById('rate').textContent=rate.toFixed(4)+' DCX/H';
 function render(){
   document.getElementById('balance').textContent=balance.toFixed(4);
-  document.getElementById('status').textContent=active?'Aktif':'Tidak aktif';
+  document.getElementById('status').textContent=active?'Active':'Inactive';
   document.getElementById('orb').classList.toggle('active',active);
   document.getElementById('mineBtn').textContent=miningLocked?'VERIFY WALLET FIRST':(active?'CLAIM DCX':'START MINING');
   document.getElementById('mineBtn').disabled=miningLocked;
