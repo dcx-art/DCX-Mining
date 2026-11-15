@@ -756,6 +756,43 @@ input:focus{
   right:auto;
 }
 </style>
+<style id="dcx-level-info-style">
+.dcx-level-card{position:relative}
+.dcx-level-info-btn{
+  position:absolute;top:18px;right:18px;z-index:4;
+  display:grid;place-items:center;width:34px;height:34px;
+  padding:7px;margin:0;border-radius:10px;
+  color:#ffe7a1;background:linear-gradient(135deg,#18385e,#10213e);
+  border:1px solid rgba(255,211,103,.8);
+  box-shadow:0 0 13px rgba(255,196,64,.16);
+  cursor:pointer;-webkit-tap-highlight-color:transparent
+}
+.dcx-level-info-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.dcx-level-info-modal[hidden]{display:none!important}
+.dcx-level-info-modal{
+  position:fixed;inset:0;z-index:99999;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  background:rgba(2,7,18,.82);backdrop-filter:blur(7px)
+}
+.dcx-level-info-panel{
+  width:min(100%,420px);padding:19px;
+  color:#eef5ff;background:linear-gradient(160deg,#14233c,#091322 75%);
+  border:1px solid rgba(79,190,255,.38);border-radius:18px;
+  box-shadow:0 20px 70px rgba(0,0,0,.55),0 0 25px rgba(44,180,255,.10)
+}
+.dcx-level-info-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.dcx-level-info-head h3{margin:0;font-size:17px;color:#8ddfff}
+.dcx-level-info-panel p{margin:0;color:#c4d3e8;font-size:14px;line-height:1.7}
+.dcx-level-info-close{
+  flex:0 0 34px;width:34px;height:34px;padding:0;margin:0;
+  border-radius:10px;background:#1b2b43;color:#d9e8ff;
+  border:1px solid rgba(141,223,255,.25);font-size:22px;line-height:1
+}
+</style>
+<script id="dcx-level-info-script">
+function openLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal');if(modal)modal.hidden=false}
+function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal');if(modal)modal.hidden=true}
+</script>
 </head>
 <body><div class="wrap">
 <header class="top"><div class="brand">DCX <span>MINING</span></div><div class="dcx-top-actions"><div class="pill" id="userTag">DCX Demo</div></div></header>
@@ -846,7 +883,10 @@ input:focus{
 </section>
 
 <section id="level" class="section">
-  <div class="card">
+  <div class="card dcx-level-card">
+    <button type="button" class="dcx-level-info-btn" aria-label="Level information" onclick="openLevelInfo()" title="Level information">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 5.5v16M8 7h8M8 11h8"/></svg>
+    </button>
     <h3>DCX Mining Levels</h3>
     <p class="small" id="levelIntro">Verify your TON wallet to activate your level information.</p>
     <div class="stats" style="margin-top:12px">
@@ -857,6 +897,17 @@ input:focus{
     <div id="levelRulesList"></div>
   </div>
 </section>
+
+<div class="dcx-level-info-modal" id="dcxLevelInfoModal" hidden onclick="if(event.target===this)closeLevelInfo()">
+  <div class="dcx-level-info-panel" role="dialog" aria-modal="true" aria-labelledby="dcxLevelInfoTitle">
+    <div class="dcx-level-info-head">
+      <h3 id="dcxLevelInfoTitle">DCX Level Announcement</h3>
+      <button type="button" class="dcx-level-info-close" aria-label="Close" onclick="closeLevelInfo()">×</button>
+    </div>
+    <p>Mining is currently available on Level 1 only. Users will be able to upgrade their mining level once DCX is officially traded on a DEX.</p>
+  </div>
+</div>
+
 <section id="wd" class="section">
 <div class="card wallet-card">
   <h3>Wallet Connection & Verification</h3>
