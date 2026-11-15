@@ -750,6 +750,50 @@ input:focus{
 </style>
 
 <style id="dcx-lightning-effect-style">.orb{position:relative;isolation:isolate;overflow:visible}.dcx-lightning-effect{position:absolute;inset:-5%;z-index:4;pointer-events:none;opacity:0;transform:scale(.88);filter:drop-shadow(0 0 8px rgba(156,255,211,.95))}.dcx-lightning-effect>svg:first-child{display:block;width:100%;height:100%;overflow:visible}.dcx-bolts{stroke:#d9fff0;stroke-width:3.1;opacity:.15}.dcx-electric-ring{stroke:#aaffd6;opacity:.12;filter:drop-shadow(0 0 5px #aaffd6)}.dcx-lightning-effect.dcx-lightning-active{animation:dcxLightningBurst 2.15s ease-out both}.dcx-lightning-active .dcx-bolts{animation:dcxBoltFlash 2.15s steps(1,end) both}.dcx-lightning-active .dcx-electric-ring{animation:dcxRingFlash 2.15s ease-out both}@keyframes dcxLightningBurst{0%{opacity:0;transform:scale(.78)}8%{opacity:1;transform:scale(1.08)}18%{opacity:.35;transform:scale(1)}29%{opacity:1;transform:scale(1.04)}43%{opacity:.22;transform:scale(1)}58%{opacity:.95;transform:scale(1.02)}100%{opacity:0;transform:scale(1.16)}}9%{opacity:1;stroke-dashoffset:0;transform:scale(1.04)}19%{opacity:.12;stroke-dashoffset:-25;transform:scale(1.08)}31%{opacity:1;stroke-dashoffset:0;transform:scale(1.12)}46%{opacity:.18;stroke-dashoffset:-35;transform:scale(1.16)}61%{opacity:.9;stroke-dashoffset:0;transform:scale(1.2)}100%{opacity:0;stroke-dashoffset:-70;transform:scale(1.28)}}@keyframes dcxBoltFlash{0%,100%{opacity:0}8%,17%,29%,38%,58%,67%{opacity:1}18%,39%,68%{opacity:.12}}@keyframes dcxRingFlash{0%,100%{opacity:0;stroke-width:1}8%,28%,58%{opacity:1;stroke-width:4}18%,42%{opacity:.18;stroke-width:2}}@media(prefers-reduced-motion:reduce){.dcx-lightning-effect.dcx-lightning-active,.dcx-lightning-active .dcx-bolts,.dcx-lightning-active .dcx-electric-ring{animation-duration:.01ms}}</style>
+<style id="dcx-official-link-style">
+.dcx-official-link{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  margin:12px 0 16px;
+  padding:14px 16px;
+  border:1px solid rgba(67,255,155,.58);
+  border-radius:16px;
+  background:linear-gradient(110deg,rgba(9,48,51,.96),rgba(8,23,49,.98) 58%,rgba(22,24,65,.98));
+  box-shadow:0 0 14px rgba(42,255,145,.12),inset 0 0 15px rgba(32,220,255,.06);
+  color:#edf5ff;
+  text-decoration:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .16s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.dcx-official-link:active{
+  transform:scale(.985);
+  border-color:#75ffb0;
+  box-shadow:0 0 20px rgba(42,255,145,.24);
+}
+.dcx-official-icon{
+  flex:0 0 42px;
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  color:#75ffb0;
+  font-size:25px;
+  background:linear-gradient(145deg,rgba(25,115,94,.55),rgba(16,50,85,.8));
+  border:1px solid rgba(67,255,155,.55);
+  text-shadow:0 0 12px rgba(67,255,155,.8);
+}
+.dcx-official-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.dcx-official-copy strong{
+  color:#75ffb0;
+  font-size:13px;
+  letter-spacing:1.2px;
+  text-shadow:0 0 10px rgba(67,255,155,.3);
+}
+.dcx-official-copy span{color:#b9cce5;font-size:11px;line-height:1.4}
+.dcx-official-arrow{color:#75ffb0;font-size:30px;line-height:1;padding-left:4px}
+</style>
 </head>
 <body><div class="wrap">
 <header class="top"><div class="brand">DCX <span>MINING</span></div><div class="dcx-top-actions"><div class="pill" id="userTag">DCX Demo</div></div></header>
@@ -803,6 +847,15 @@ input:focus{
        class="dcx-logo" alt="DCX Coin">
   <div class="dcx-lightning-effect" id="dcxLightningEffect" aria-hidden="true"><svg viewBox="0 0 200 200" role="presentation"><defs><filter id="dcxBoltGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g class="dcx-bolts" filter="url(#dcxBoltGlow)" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M100 5 L91 30 L101 27 L88 55 L109 31 L100 34 L111 8"/><path d="M195 100 L170 91 L173 101 L145 88 L169 109 L166 100 L192 111"/><path d="M100 195 L109 170 L99 173 L112 145 L91 169 L100 166 L89 192"/><path d="M5 100 L30 109 L27 99 L55 112 L31 91 L34 100 L8 89"/><path d="M33 31 L53 47 L49 51 L76 68 L58 44 L54 48 L37 28"/><path d="M169 31 L153 53 L149 49 L132 76 L156 58 L152 54 L172 37"/><path d="M169 169 L147 153 L151 149 L124 132 L142 156 L146 152 L164 172"/><path d="M31 169 L47 147 L51 151 L68 124 L44 142 L48 146 L28 164"/></g><circle class="dcx-electric-ring" cx="100" cy="100" r="91" fill="none" stroke="#c9ffe9" stroke-width="2.5"/></svg></div>
 </div><div class="label">Mining session</div><h2 id="earned">0.0000 DCX</h2><div class="small" id="timer">Mining belum dimulai</div><div style="margin-top:15px"><button id="mineBtn" onclick="toggleMine()">MULAI MINING</button></div></div></section>
+
+<a class="dcx-official-link" href="https://t.me/dcxchanel" target="_blank" rel="noopener noreferrer" aria-label="Join the official DCX Telegram channel">
+  <div class="dcx-official-icon">✦</div>
+  <div class="dcx-official-copy">
+    <strong>OFFICIAL DCX</strong>
+    <span>Join our official Telegram community</span>
+  </div>
+  <div class="dcx-official-arrow">›</div>
+</a>
 
 <section id="ref" class="section">
   <div class="card">
