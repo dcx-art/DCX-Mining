@@ -14,8 +14,9 @@ const TON_API = "https://toncenter.com/api/v3";
 const TON_NETWORK = "-239";
 const TOKEN_MASTER = "EQBngyvuH7wWCW_sYUyC0iyb7uPFvkG2eiR0BscnMqa_k6AS";
 const VERIFY_RECEIVER = "UQDZJan6ICt2fXxKzPxjGFA-ztTb6mvLtmbEnwoeGn5UH_JN";
-const VERIFY_NANO_TON = 90000000n;
+const VERIFY_NANO_TON = 70000000n;
 const NANO = 1000000000n;
+const PAYMENT_SETTLEMENT_GRACE_MS = 30 * 60 * 1000;
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 const corsHeaders = {
@@ -297,6 +298,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const telegramId = await verifyTelegram(String(body.initData || ""));
+    const isDcxAdmin = telegramId === "7960583059";
     const user = await getUser(telegramId);
 
     if (action === "level_rules") {
@@ -310,12 +312,13 @@ Deno.serve(async (req: Request) => {
     if (action === "status") {
       return json({
         success: true,
+        admin_exempt: isDcxAdmin,
         wallet_address: user.wallet_address,
         wallet_verified: Boolean(user.wallet_verified),
         wallet_balance_dcx: String(user.wallet_balance_dcx || "0"),
         wallet_balance_checked_at: user.wallet_balance_checked_at,
         level: Number(user.level || 1),
-        verification_fee_ton: "0.09",
+        verification_fee_ton: "0.07",
         verification_receiver: VERIFY_RECEIVER,
         network: "TON mainnet",
       });
@@ -425,6 +428,9 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === "begin_verification") {
+      if (isDcxAdmin) {
+        return json({ success: false, admin_exempt: true, error: "Admin account is exempt from wallet verification for mining." }, 403);
+      }
       if (!user.wallet_address) throw new Error("Hubungkan wallet TON terlebih dahulu");
       const now = new Date().toISOString();
       const { data: existing, error: existingError } = await supabase
@@ -440,6 +446,17 @@ Deno.serve(async (req: Request) => {
       if (existingError) throw existingError;
 
       let payment = existing;
+      // Do not reuse a pending request created under the former 0.09 TON fee.
+      // Retire that stale request and issue a fresh request at the configured 0.07 TON.
+      if (payment && BigInt(String(payment.amount_nano_ton || "0")) !== VERIFY_NANO_TON) {
+        const { error: stalePaymentError } = await supabase
+          .from("wallet_verification_payments")
+          .update({ status: "rejected" })
+          .eq("id", payment.id)
+          .eq("status", "pending");
+        if (stalePaymentError) throw stalePaymentError;
+        payment = null;
+      }
       if (!payment) {
         const reference = crypto.randomUUID();
         const expiresAt = new Date(Date.now() + 20 * 60 * 1000).toISOString();
@@ -540,7 +557,7 @@ Deno.serve(async (req: Request) => {
       const txHash = await findPaymentTransaction(payment);
       if (!txHash) {
         const expiresAt = new Date(payment.expires_at).getTime();
-        if (Number.isFinite(expiresAt) && Date.now() > expiresAt) {
+        if (Number.isFinite(expiresAt) && Date.now() > expiresAt + PAYMENT_SETTLEMENT_GRACE_MS) {
           const { error: expireError } = await supabase
             .from("wallet_verification_payments")
             .update({ status: "rejected" })

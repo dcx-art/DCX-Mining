@@ -1423,7 +1423,7 @@ function startWalletPaymentAutoCheck() {
 function restoreWalletPayment() {
   try {
     const saved = JSON.parse(localStorage.getItem(WALLET_PAYMENT_STORAGE_KEY) || 'null');
-    if (!saved?.paymentId || !saved?.expiresAt || new Date(saved.expiresAt).getTime() <= Date.now()) {
+    if (!saved?.paymentId || !saved?.expiresAt || new Date(saved.expiresAt).getTime() + 30 * 60 * 1000 <= Date.now()) {
       clearWalletPayment();
       return;
     }
@@ -1544,7 +1544,7 @@ async function initializeTonConnect() {
 }
 
 async function beginWalletVerification() {
-  const agreed = confirm('Wallet verification costs 0.09 TON on TON Mainnet.\n\nVerification helps minimize bot abuse and protect the ecosystem as it continues to grow.\n\nContinue only if you agree.');
+  const agreed = confirm('Wallet verification costs 0.07 TON on TON Mainnet.\n\nVerification helps minimize bot abuse and protect the ecosystem as it continues to grow.\n\nContinue only if you agree.');
   if (!agreed) return;
   const button = document.getElementById('beginWalletVerificationBtn');
   button.disabled = true;
