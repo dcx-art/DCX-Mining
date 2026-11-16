@@ -446,6 +446,17 @@ Deno.serve(async (req: Request) => {
       if (existingError) throw existingError;
 
       let payment = existing;
+      // Do not reuse a pending request created under the former 0.09 TON fee.
+      // Retire that stale request and issue a fresh request at the configured 0.07 TON.
+      if (payment && BigInt(String(payment.amount_nano_ton || "0")) !== VERIFY_NANO_TON) {
+        const { error: stalePaymentError } = await supabase
+          .from("wallet_verification_payments")
+          .update({ status: "rejected" })
+          .eq("id", payment.id)
+          .eq("status", "pending");
+        if (stalePaymentError) throw stalePaymentError;
+        payment = null;
+      }
       if (!payment) {
         const reference = crypto.randomUUID();
         const expiresAt = new Date(Date.now() + 20 * 60 * 1000).toISOString();
