@@ -106,6 +106,10 @@ overflow-wrap:anywhere;
 color:var(--gold);
 font-size:15px;
 }
+.balance-decimal{
+  font-size:15px;
+  font-weight:900;
+}
 .stats{
 display:grid;
 grid-template-columns:1fr 1fr;
@@ -823,7 +827,7 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
     <div class="dex-listing">DEX LISTING: <span>COMING SOON</span></div>
   </div>
   <div class="balance">
-    <span id="balance">0.0000</span>
+    <span id="balance"><span id="balanceWhole">0</span><span id="balanceDecimal" class="balance-decimal">.0000</span></span>
     <span class="token">DCX</span>
   </div>
   <div class="small">Your DCX mining assets</div>
@@ -998,7 +1002,9 @@ let rewardSnapshotAt=Date.now();
 let dailyReward=100, rate=dailyReward/24;
 document.getElementById('rate').textContent=rate.toFixed(4)+' DCX/H';
 function render(){
-  document.getElementById('balance').textContent=balance.toFixed(4);
+  const balanceParts=balance.toFixed(4).split('.');
+  document.getElementById('balanceWhole').textContent=balanceParts[0];
+  document.getElementById('balanceDecimal').textContent='.'+balanceParts[1];
   document.getElementById('status').textContent=active?'Active':'Inactive';
   document.getElementById('orb').classList.toggle('active',active);
   document.getElementById('mineBtn').textContent=miningLocked?'VERIFY WALLET FIRST':(active?'CLAIM DCX':'START MINING');
