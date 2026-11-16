@@ -1938,6 +1938,27 @@ async function dcxLoadWithdrawals() {
       const friendlyAddress = formatTonFriendlyAddress(request.wallet_address);
       const address = dcxAdminText('p', friendlyAddress, 'font-size:11px;overflow-wrap:anywhere;word-break:break-all;background:#080f1c;padding:9px;border-radius:8px');
       card.append(address);
+
+      // A readable marker for the recipient's DCX Jetton transaction comment.
+      const withdrawalComment = 'W-DCX #' + request.id;
+      card.append(
+        dcxAdminText('p', 'DCX transaction comment (paste this into Tonkeeper):', 'margin:10px 0 5px;font-size:12px;color:#91a8cb'),
+        dcxAdminText('b', withdrawalComment, 'display:block;padding:10px 12px;border:1px solid rgba(67,255,155,.55);border-radius:9px;background:#061629;color:#7fffc0;font-size:16px;letter-spacing:.5px')
+      );
+      const copyComment = document.createElement('button');
+      copyComment.className = 'secondary';
+      copyComment.textContent = 'COPY W-DCX COMMENT';
+      copyComment.style.marginTop = '6px';
+      copyComment.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(withdrawalComment);
+          message.textContent = 'W-DCX comment copied for request #' + request.id + '. Paste it into the DCX Jetton transfer comment in Tonkeeper.';
+        } catch (_) {
+          message.textContent = 'Copy unavailable. Select and copy the W-DCX comment manually.';
+        }
+      };
+      card.append(copyComment);
+
       const copy = document.createElement('button');
       copy.className = 'secondary';
       copy.textContent = 'COPY FRIENDLY ADDRESS';
