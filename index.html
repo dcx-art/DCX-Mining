@@ -985,7 +985,7 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
     <p class="small" id="dcxAdminUserSearchMessage">Enter a Telegram ID to view account information.</p>
     <div id="dcxAdminUserResult"></div>
   </div>
-  <div class="card">
+  <div class="card" id="dcxAdminWithdrawalQueueCard">
     <h3>Withdrawal Queue</h3>
     <p class="small">Review requests below. Send DCX manually from the Payout Wallet only after checking the verified destination.</p>
     <button class="secondary" id="dcxRefreshWithdrawalsBtn" onclick="dcxLoadWithdrawals()">REFRESH WITHDRAWAL QUEUE</button>
@@ -1200,7 +1200,7 @@ if(connectionStatus){
     btn.disabled=false;
   }
 }
-function tab(id,btn){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));section.classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();if(id==='wd')dcxLoadMyWithdrawals();if(id==='admin'){dcxLoadAdminStats();dcxLoadWithdrawals();}if(id==='device-monitoring')dcxLoadDeviceGroups();}
+function tab(id,btn){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));section.classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();if(id==='wd'){if(window.dcxIsAdmin)dcxLoadWithdrawals();else dcxLoadMyWithdrawals();}if(id==='admin'){dcxLoadAdminStats();dcxLoadWithdrawals();}if(id==='device-monitoring')dcxLoadDeviceGroups();}
 function copyRef(){navigator.clipboard?.writeText(document.getElementById('refLink').value).then(()=>alert('Link disalin')); }
 function setMaxWithdraw(){document.getElementById("amount").value=Math.floor(Number(balance)||0);document.getElementById("wdmsg").textContent="Maximum available whole-number balance filled."; }
 async function withdraw(){
@@ -2087,6 +2087,12 @@ async function dcxLoadAdminTools() {
   try {
     const result = await dcxWithdrawApi('admin_check');
     if (result.is_admin) {
+      window.dcxIsAdmin = true;
+      const withdrawTab = document.querySelector('.tabs button[onclick="tab(\'wd\',this)"]');
+      if (withdrawTab) withdrawTab.textContent = '↗ Withdrawal Queue';
+      const withdrawSection = document.getElementById('wd');
+      const queueCard = document.getElementById('dcxAdminWithdrawalQueueCard');
+      if (withdrawSection && queueCard) withdrawSection.replaceChildren(queueCard);
       const adminTab = document.getElementById('dcxAdminTabBtn');
       if (adminTab) adminTab.style.display = 'block';
       const monitorTab = document.getElementById('dcxDeviceMonitorTabBtn');
