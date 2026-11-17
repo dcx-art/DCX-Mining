@@ -1930,6 +1930,30 @@ function dcxAdminText(tag, value, style = '') {
   return node;
 }
 
+function dcxTonFriendlyAddress(address) {
+  const value = String(address || '').trim();
+  if (!value) return 'No wallet connected';
+  if (/^[A-Za-z0-9_-]{48}$/.test(value)) return value;
+  const match = value.match(/^(-?\\d+):([0-9a-fA-F]{64})$/);
+  if (!match) return value;
+  const workchain = Number(match[1]);
+  if (!Number.isInteger(workchain) || workchain < -128 || workchain > 127) return value;
+  const bytes = new Uint8Array(36);
+  bytes[0] = 0x11; // Bounceable user-friendly address
+  bytes[1] = workchain & 0xff;
+  for (let i = 0; i < 32; i++) bytes[i + 2] = parseInt(match[2].slice(i * 2, i * 2 + 2), 16);
+  let crc = 0;
+  for (let i = 0; i < 34; i++) {
+    crc ^= bytes[i] << 8;
+    for (let bit = 0; bit < 8; bit++) crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) & 0xffff : (crc << 1) & 0xffff;
+  }
+  bytes[34] = (crc >> 8) & 0xff;
+  bytes[35] = crc & 0xff;
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/g, '');
+}
+
 async function dcxAdminFindUser() {
   const input = document.getElementById('dcxAdminUserSearchId');
   const button = document.getElementById('dcxAdminUserSearchBtn');
@@ -1959,7 +1983,7 @@ async function dcxAdminFindUser() {
       ['Mining Started', user.mining_started_at ? new Date(user.mining_started_at).toLocaleString() : 'Not started'],
       ['Last Mining Claim', (user.mining_last_claim_at || user.mining_last_claimed_at) ? new Date(user.mining_last_claim_at || user.mining_last_claimed_at).toLocaleString() : 'No claim recorded'],
       ['Wallet Status', user.wallet_verified ? 'VERIFIED' : (user.wallet_address ? 'CONNECTED — NOT VERIFIED' : 'NOT CONNECTED')],
-      ['TON Wallet', user.wallet_address || 'No wallet connected'],
+      ['TON Wallet (Friendly Address)', dcxTonFriendlyAddress(user.wallet_address)],
       ['Wallet Verified At', user.wallet_verified_at ? new Date(user.wallet_verified_at).toLocaleString() : 'Not verified'],
       ['Verified DCX Holding', Number(user.wallet_balance_dcx || 0).toLocaleString('en-US') + ' DCX'],
       ['Holding Last Checked', user.wallet_balance_checked_at ? new Date(user.wallet_balance_checked_at).toLocaleString() : 'Not checked'],
