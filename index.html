@@ -1934,7 +1934,7 @@ function dcxTonFriendlyAddress(address) {
   const value = String(address || '').trim();
   if (!value) return 'No wallet connected';
   if (/^[A-Za-z0-9_-]{48}$/.test(value)) return value;
-  const match = value.match(/^(-?\\d+):([0-9a-fA-F]{64})$/);
+  const match = value.match(/^(-?\d+):([0-9a-fA-F]{64})$/);
   if (!match) return value;
   const workchain = Number(match[1]);
   if (!Number.isInteger(workchain) || workchain < -128 || workchain > 127) return value;
@@ -1951,7 +1951,7 @@ function dcxTonFriendlyAddress(address) {
   bytes[35] = crc & 0xff;
   let binary = '';
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/g, '');
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
 async function dcxAdminFindUser() {
