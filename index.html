@@ -1991,6 +1991,7 @@ async function dcxLoadDeviceGroups(){
     if(!response.ok||!result.success)throw new Error(result.error||'Unable to load device monitoring data.');
     const exactGroups=Array.isArray(result.groups)?result.groups:[];
     const candidates=Array.isArray(result.signal_candidates)?result.signal_candidates:[];
+    const nearMatches=Array.isArray(result.near_matches)?result.near_matches:[];
     document.getElementById('dcxDeviceGroupCount').textContent=Number(result.total_signal_candidate_groups||0).toLocaleString('en-US');
     document.getElementById('dcxDeviceAccountCount').textContent=Number(result.total_accounts_in_signal_candidates||0).toLocaleString('en-US');
     const makeAccountList=(accounts)=>{
@@ -2007,7 +2008,7 @@ async function dcxLoadDeviceGroups(){
       });
       return accountList;
     };
-    if(!exactGroups.length&&!candidates.length){
+    if(!exactGroups.length&&!candidates.length&&!nearMatches.length){
       message.textContent='No shared installation or matching environment candidates yet. Data will accumulate as users open DCX.';
       return;
     }
@@ -2027,6 +2028,20 @@ async function dcxLoadDeviceGroups(){
           dcxAdminText('p','Review only: different devices may share these settings. Do not restrict accounts based on this match alone.','margin:7px 0;font-size:11px;color:#f2c879')
         );
         card.append(makeAccountList(group.accounts));
+        list.append(card);
+      });
+    }
+    if(nearMatches.length){
+      list.append(dcxAdminText('b','NEAR MATCHES — SEPARATE REVIEW ('+nearMatches.length+')','display:block;margin-top:16px'));
+      nearMatches.forEach(match=>{
+        const card=document.createElement('div');
+        card.className='level';
+        card.style.marginTop='10px';
+        card.append(
+          dcxAdminText('b','Near match · '+match.similarity_percent+'% similarity'),
+          dcxAdminText('p','These accounts differ in one of six signals. They are not merged into a shared-device group.','margin:7px 0;font-size:11px;color:#f2c879')
+        );
+        card.append(makeAccountList(match.accounts));
         list.append(card);
       });
     }
