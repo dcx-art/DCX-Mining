@@ -843,7 +843,7 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
     </div>
   </div>
 </div>
-<div class="tabs"><button class="active" onclick="tab('mine',this)">⛏ Mining</button><button class="secondary" onclick="tab('ref',this)">♧ Referral</button><button class="secondary" onclick="tab('level',this)">⚡ Level</button><button class="secondary" onclick="tab('wd',this)">↗ Withdraw</button></div>
+<div class="tabs"><button class="active" onclick="tab('mine',this)">⛏ Mining</button><button class="secondary" onclick="tab('ref',this)">♧ Referral</button><button class="secondary" onclick="tab('level',this)">⚡ Level</button><button class="secondary" onclick="tab('wd',this)">↗ Withdraw</button><button class="secondary" id="dcxAdminTabBtn" style="display:none" onclick="tab('admin',this)">★ Admin</button></div>
 <section id="mine" class="section show">
 <div class="card mining"><a class="dcx-checkin-top dcx-official-top" href="https://t.me/dcxchanel" target="_blank" rel="noopener noreferrer">OFFICIAL DCX</a><button type="button" class="dcx-checkin-top" onclick="openDailyCheckin()">CHECK IN</button><div class="orb" id="orb">
   <img src="https://dcx-art.github.io/DCX-Mining/dcx-coin.png?v=2"
@@ -957,6 +957,9 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
   <p id="wdmsg" class="small"></p>
 </div>
 <div class="card"><h3>My Withdrawal Requests</h3><button class="secondary" id="dcxRefreshMyWithdrawalsBtn" onclick="dcxLoadMyWithdrawals()">REFRESH MY REQUESTS</button><p class="small" id="dcxMyWithdrawalsMessage">Your withdrawal history will appear here.</p><div id="dcxMyWithdrawalsList"></div></div>
+
+</section>
+<section id="admin" class="section" aria-label="DCX Admin Panel">
 <div id="dcxAdminTestPanel" style="display:none">
   <div class="card">
     <h3>DCX ADMIN STATISTICS</h3>
@@ -1147,7 +1150,7 @@ if(connectionStatus){
     btn.disabled=false;
   }
 }
-function tab(id,btn){document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));document.getElementById(id).classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();if(id==='wd')dcxLoadMyWithdrawals();}
+function tab(id,btn){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));section.classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();if(id==='wd')dcxLoadMyWithdrawals();if(id==='admin'){dcxLoadAdminStats();dcxLoadWithdrawals();}}
 function copyRef(){navigator.clipboard?.writeText(document.getElementById('refLink').value).then(()=>alert('Link disalin')); }
 function setMaxWithdraw(){document.getElementById("amount").value=Math.floor(Number(balance)||0);document.getElementById("wdmsg").textContent="Maximum available whole-number balance filled."; }
 async function withdraw(){
@@ -1901,6 +1904,8 @@ async function dcxLoadAdminTools() {
   try {
     const result = await dcxWithdrawApi('admin_check');
     if (result.is_admin) {
+      const adminTab = document.getElementById('dcxAdminTabBtn');
+      if (adminTab) adminTab.style.display = 'block';
       document.getElementById('dcxAdminTestPanel').style.display = 'block';
       await Promise.all([dcxLoadAdminStats(), dcxLoadWithdrawals()]);
     }
