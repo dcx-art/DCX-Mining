@@ -998,7 +998,7 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
 <section id="device-monitoring" class="section" aria-label="Multi-Account Monitoring">
   <div class="card">
     <h3>Multi-Account Device Monitoring</h3>
-    <p class="small">DCX compares saved installation IDs and limited browser/device environment signals to identify possible account links. Matches are indicators for admin review, not proof of one physical device.</p>
+    <p class="small">This page only shows accounts sharing the exact same DCX installation ID. Similarity scores from common browser/device settings are not used to group accounts. A shared installation ID is an indicator of the same app storage, not definitive proof of one physical device.</p>
     <div class="stats" style="margin:12px 0">
       <div class="stat"><div class="label">POTENTIAL DEVICE GROUPS</div><b id="dcxDeviceGroupCount">—</b></div>
       <div class="stat"><div class="label">ACCOUNTS IN GROUPS</div><b id="dcxDeviceAccountCount">—</b></div>
@@ -1995,10 +1995,9 @@ async function dcxLoadDeviceGroups(){
     const result=await response.json();
     if(!response.ok||!result.success)throw new Error(result.error||'Unable to load device monitoring data.');
     const exactGroups=Array.isArray(result.groups)?result.groups:[];
-    const candidates=Array.isArray(result.signal_candidates)?result.signal_candidates:[];
-    const nearMatches=Array.isArray(result.near_matches)?result.near_matches:[];
-    document.getElementById('dcxDeviceGroupCount').textContent=Number(result.total_signal_candidate_groups||0).toLocaleString('en-US');
-    document.getElementById('dcxDeviceAccountCount').textContent=Number(result.total_accounts_in_signal_candidates||0).toLocaleString('en-US');
+    const exactAccountCount=exactGroups.reduce((sum,group)=>sum+Number(group.account_count||0),0);
+    document.getElementById('dcxDeviceGroupCount').textContent=exactGroups.length.toLocaleString('en-US');
+    document.getElementById('dcxDeviceAccountCount').textContent=exactAccountCount.toLocaleString('en-US');
     const makeSection=(heading,count)=>{
       const details=document.createElement('details');
       details.style.cssText='margin-top:12px;border:1px solid rgba(91,220,190,.35);border-radius:12px;padding:10px 12px;background:rgba(8,25,48,.35)';
@@ -2025,43 +2024,11 @@ async function dcxLoadDeviceGroups(){
       });
       return accountList;
     };
-    if(!exactGroups.length&&!candidates.length&&!nearMatches.length){
-      message.textContent='No shared installation or matching environment candidates yet. Data will accumulate as users open DCX.';
+    if(!exactGroups.length){
+      message.textContent='No shared installation IDs found. Similarity scores are intentionally excluded to avoid grouping unrelated users.';
       return;
     }
-    message.textContent='Updated '+new Date(result.generated_at||Date.now()).toLocaleString()+'. Open a section below to inspect details. Matches are not proof of one physical device.';
-    if(candidates.length){
-      const section=makeSection('POTENTIAL DEVICE MATCHES',candidates.length);
-      candidates.forEach(group=>{
-        const card=document.createElement('div');
-        card.className='level';
-        card.style.marginTop='8px';
-        card.append(
-          dcxAdminText('b','Similar environment · '+group.account_count+' accounts'),
-          dcxAdminText('p','Reference: '+group.signal_ref+' · '+group.installation_count+' installation(s)','margin:7px 0;font-size:11px'),
-          dcxAdminText('p','Minimum pair similarity: '+Number(group.minimum_similarity_percent||0)+'% (5 of 6 signals required)','margin:7px 0;font-size:11px'),
-          dcxAdminText('p','Last seen: '+new Date(group.last_seen_at).toLocaleString(),'margin:7px 0;font-size:11px'),
-          dcxAdminText('p','Signals: '+Object.entries(group.signal_summary||{}).map(([k,v])=>k.replace(/_/g,' ')+': '+v).join(' · '),'margin:7px 0;font-size:11px;overflow-wrap:anywhere'),
-          dcxAdminText('p','Review only: different devices may share these settings. Do not restrict accounts based on this match alone.','margin:7px 0;font-size:11px;color:#f2c879')
-        );
-        card.append(makeAccountList(group.accounts));
-        section.append(card);
-      });
-    }
-    if(nearMatches.length){
-      const section=makeSection('NEAR MATCHES — SEPARATE REVIEW',nearMatches.length);
-      nearMatches.forEach(match=>{
-        const card=document.createElement('div');
-        card.className='level';
-        card.style.marginTop='8px';
-        card.append(
-          dcxAdminText('b','Near match · '+match.similarity_percent+'% similarity'),
-          dcxAdminText('p','These accounts differ in one of six signals. They are not merged into a shared-device group.','margin:7px 0;font-size:11px;color:#f2c879')
-        );
-        card.append(makeAccountList(match.accounts));
-        section.append(card);
-      });
-    }
+    message.textContent='Updated '+new Date(result.generated_at||Date.now()).toLocaleString()+'. Only exact shared installation IDs are shown; this is not definitive proof of one physical device.';
     if(exactGroups.length){
       const section=makeSection('SHARED INSTALLATION IDs',exactGroups.length);
       exactGroups.forEach(group=>{
