@@ -1758,7 +1758,7 @@ async function loadWalletStatus() {
     document.getElementById('walletAddressText').textContent = result.wallet_address ? formatTonFriendlyAddress(result.wallet_address) : (result.admin_exempt ? 'Wallet verification is not required for admin mining.' : 'No wallet connected yet.');
     document.getElementById('walletLevel').textContent = 'Level ' + Number(result.level || 1);
     document.getElementById('walletHolding').textContent = Number(result.wallet_balance_dcx || 0).toLocaleString('en-US') + ' DCX';
-    if (result.wallet_verified) loadLevelRules();
+    if (result.wallet_verified || result.admin_exempt) await loadLevelRules();
     document.getElementById('walletCheckedAt').textContent = result.wallet_balance_checked_at ? 'Last checked: ' + new Date(result.wallet_balance_checked_at).toLocaleString() : 'DCX holding has not been checked yet.';
     document.getElementById('walletPaymentPanel').style.display = !result.admin_exempt && result.wallet_address && !result.wallet_verified ? 'block' : 'none';
     document.getElementById('beginWalletVerificationBtn').style.display = (result.wallet_verified || result.admin_exempt) ? 'none' : 'block';
