@@ -1994,13 +1994,25 @@ async function dcxLoadDeviceGroups(){
     const nearMatches=Array.isArray(result.near_matches)?result.near_matches:[];
     document.getElementById('dcxDeviceGroupCount').textContent=Number(result.total_signal_candidate_groups||0).toLocaleString('en-US');
     document.getElementById('dcxDeviceAccountCount').textContent=Number(result.total_accounts_in_signal_candidates||0).toLocaleString('en-US');
+    const makeSection=(heading,count)=>{
+      const details=document.createElement('details');
+      details.style.cssText='margin-top:12px;border:1px solid rgba(91,220,190,.35);border-radius:12px;padding:10px 12px;background:rgba(8,25,48,.35)';
+      const summary=document.createElement('summary');
+      summary.textContent=heading+' ('+count+')';
+      summary.style.cssText='cursor:pointer;font-weight:700;font-size:13px;line-height:1.5;list-style-position:inside';
+      const content=document.createElement('div');
+      content.style.marginTop='10px';
+      details.append(summary,content);
+      list.append(details);
+      return content;
+    };
     const makeAccountList=(accounts)=>{
       const accountList=document.createElement('div');
       accountList.style.cssText='margin-top:8px;border-top:1px solid rgba(255,255,255,.12);padding-top:7px';
       (accounts||[]).forEach(account=>{
         const label=account.username?'@'+String(account.username).replace(/^@/,''):'No username';
         const w=account.withdrawals||{};
-        const summary='Withdrawals: '+Number(w.count||0)+' request(s), '+Number(w.total_amount||0).toLocaleString('en-US')+' DCX total · pending '+Number(w.pending_count||0)+' · completed '+Number(w.completed_count||0);
+        const summary='Withdrawals: '+Number(w.count||0).toLocaleString('en-US')+' request(s), '+Number(w.total_amount||0).toLocaleString('en-US')+' DCX total · pending '+Number(w.pending_count||0)+' · completed '+Number(w.completed_count||0);
         accountList.append(
           dcxAdminText('p',label+' · ID '+account.telegram_id,'margin:5px 0;font-size:12px;overflow-wrap:anywhere'),
           dcxAdminText('p',summary,'margin:3px 0 9px 10px;font-size:11px;opacity:.8;overflow-wrap:anywhere')
@@ -2012,13 +2024,13 @@ async function dcxLoadDeviceGroups(){
       message.textContent='No shared installation or matching environment candidates yet. Data will accumulate as users open DCX.';
       return;
     }
-    message.textContent='Updated '+new Date(result.generated_at||Date.now()).toLocaleString()+'. Candidate matches require manual review and are not proof of one physical device.';
+    message.textContent='Updated '+new Date(result.generated_at||Date.now()).toLocaleString()+'. Open a section below to inspect details. Matches are not proof of one physical device.';
     if(candidates.length){
-      list.append(dcxAdminText('b','POTENTIAL DEVICE MATCHES ('+candidates.length+')','display:block;margin-top:12px'));
+      const section=makeSection('POTENTIAL DEVICE MATCHES',candidates.length);
       candidates.forEach(group=>{
         const card=document.createElement('div');
         card.className='level';
-        card.style.marginTop='10px';
+        card.style.marginTop='8px';
         card.append(
           dcxAdminText('b','Similar environment · '+group.account_count+' accounts'),
           dcxAdminText('p','Reference: '+group.signal_ref+' · '+group.installation_count+' installation(s)','margin:7px 0;font-size:11px'),
@@ -2028,36 +2040,36 @@ async function dcxLoadDeviceGroups(){
           dcxAdminText('p','Review only: different devices may share these settings. Do not restrict accounts based on this match alone.','margin:7px 0;font-size:11px;color:#f2c879')
         );
         card.append(makeAccountList(group.accounts));
-        list.append(card);
+        section.append(card);
       });
     }
     if(nearMatches.length){
-      list.append(dcxAdminText('b','NEAR MATCHES — SEPARATE REVIEW ('+nearMatches.length+')','display:block;margin-top:16px'));
+      const section=makeSection('NEAR MATCHES — SEPARATE REVIEW',nearMatches.length);
       nearMatches.forEach(match=>{
         const card=document.createElement('div');
         card.className='level';
-        card.style.marginTop='10px';
+        card.style.marginTop='8px';
         card.append(
           dcxAdminText('b','Near match · '+match.similarity_percent+'% similarity'),
           dcxAdminText('p','These accounts differ in one of six signals. They are not merged into a shared-device group.','margin:7px 0;font-size:11px;color:#f2c879')
         );
         card.append(makeAccountList(match.accounts));
-        list.append(card);
+        section.append(card);
       });
     }
     if(exactGroups.length){
-      list.append(dcxAdminText('b','SHARED INSTALLATION IDs ('+exactGroups.length+')','display:block;margin-top:16px'));
+      const section=makeSection('SHARED INSTALLATION IDs',exactGroups.length);
       exactGroups.forEach(group=>{
         const card=document.createElement('div');
         card.className='level';
-        card.style.marginTop='10px';
+        card.style.marginTop='8px';
         card.append(
           dcxAdminText('b','Installation '+group.installation_ref+' · '+group.account_count+' accounts'),
           dcxAdminText('p','First seen: '+new Date(group.first_seen_at).toLocaleString(),'margin:7px 0;font-size:11px'),
           dcxAdminText('p','Last seen: '+new Date(group.last_seen_at).toLocaleString(),'margin:7px 0;font-size:11px')
         );
         card.append(makeAccountList(group.accounts));
-        list.append(card);
+        section.append(card);
       });
     }
   }catch(error){
