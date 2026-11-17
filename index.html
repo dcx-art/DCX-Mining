@@ -1200,7 +1200,7 @@ if(connectionStatus){
     btn.disabled=false;
   }
 }
-function tab(id,btn){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));section.classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();if(id==='wd'){if(window.dcxIsAdmin)dcxLoadWithdrawals();else dcxLoadMyWithdrawals();}if(id==='level')loadLevelRules(Boolean(window.dcxWalletAdminExempt));if(id==='admin'){dcxLoadAdminStats();dcxLoadWithdrawals();}if(id==='device-monitoring')dcxLoadDeviceGroups();}
+function tab(id,btn){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));section.classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level'){const status=document.getElementById('walletVerifyStatus')?.textContent;if(status==='Checking...')return;if(status==='UNAVAILABLE'){loadWalletStatus();return;}loadLevelRules(Boolean(window.dcxWalletAdminExempt));}if(id==='wd'){if(window.dcxIsAdmin)dcxLoadWithdrawals();else dcxLoadMyWithdrawals();}if(id==='admin'){dcxLoadAdminStats();dcxLoadWithdrawals();}if(id==='device-monitoring')dcxLoadDeviceGroups();}
 function copyRef(){navigator.clipboard?.writeText(document.getElementById('refLink').value).then(()=>alert('Link disalin')); }
 function setMaxWithdraw(){document.getElementById("amount").value=Math.floor(Number(balance)||0);document.getElementById("wdmsg").textContent="Maximum available whole-number balance filled."; }
 async function withdraw(){
