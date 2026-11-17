@@ -987,9 +987,9 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
   </div>
   <div class="card">
     <h3>Multi-Account Device Monitoring</h3>
-    <p class="small">Accounts are grouped when they use the same saved DCX app/browser installation ID. This is an installation match, not proof of one physical device.</p>
+    <p class="small">DCX compares saved installation IDs and limited browser/device environment signals to identify possible account links. Matches are indicators for admin review, not proof of one physical device.</p>
     <div class="stats" style="margin:12px 0">
-      <div class="stat"><div class="label">SHARED INSTALLATIONS</div><b id="dcxDeviceGroupCount">—</b></div>
+      <div class="stat"><div class="label">POTENTIAL DEVICE GROUPS</div><b id="dcxDeviceGroupCount">—</b></div>
       <div class="stat"><div class="label">ACCOUNTS IN GROUPS</div><b id="dcxDeviceAccountCount">—</b></div>
     </div>
     <button class="secondary" id="dcxRefreshDeviceGroupsBtn" onclick="dcxLoadDeviceGroups()">REFRESH DEVICE GROUPS</button>
@@ -1031,7 +1031,11 @@ async function dcxRegisterInstallation(){
     const response=await fetch(DCX_DEVICE_API,{
       method:'POST',
       headers:{'Content-Type':'application/json','apikey':'sb_publishable_ts1Ofuwy7cat9DEX6NyI-Q_ZeLx3pwI'},
-      body:JSON.stringify({action:'register_installation',initData:tg.initData,installationId})
+      body:JSON.stringify({action:'register_installation',initData:tg.initData,installationId,deviceSignals:(()=>{
+        const ua=navigator.userAgent||'';
+        const browser=/Edg\//i.test(ua)?'edge':/Firefox\//i.test(ua)?'firefox':/Chrome\//i.test(ua)?'chromium':/Safari\//i.test(ua)?'safari':'other';
+        return {platform:navigator.platform||'',browser,language:navigator.language||'',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone||'',screenWidth:screen.width||0,screenHeight:screen.height||0,pixelRatio:window.devicePixelRatio||1};
+      })()})
     });
     if(!response.ok)console.warn('DCX installation registration unavailable:',response.status);
   }catch(error){console.warn('DCX installation registration skipped:',error);}
