@@ -969,6 +969,10 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
       <div class="stat"><div class="label">NEW USERS · 7 DAYS</div><b id="dcxAdminNewWeek">—</b></div>
       <div class="stat"><div class="label">VERIFIED WALLETS</div><b id="dcxAdminVerifiedWallets">—</b></div>
     </div>
+    <div style="margin:16px 0">
+      <h4 style="margin:0 0 10px">USER DISTRIBUTION BY LEVEL</h4>
+      <div id="dcxAdminLevelDistribution"><p class="small">Level distribution will appear here.</p></div>
+    </div>
     <button class="secondary" id="dcxRefreshAdminStatsBtn" onclick="dcxLoadAdminStats()">REFRESH STATISTICS</button>
     <p class="small" id="dcxAdminStatsUpdated">Statistics are available to authorized admins only.</p>
   </div>
@@ -1901,6 +1905,33 @@ async function dcxLoadAdminStats() {
     document.getElementById('dcxAdminNewToday').textContent = Number(stats.new_users_today || 0).toLocaleString('en-US');
     document.getElementById('dcxAdminNewWeek').textContent = Number(stats.new_users_7d || 0).toLocaleString('en-US');
     document.getElementById('dcxAdminVerifiedWallets').textContent = Number(stats.verified_wallets || 0).toLocaleString('en-US');
+    const distribution = document.getElementById('dcxAdminLevelDistribution');
+    if (distribution) {
+      distribution.replaceChildren();
+      const rows = Array.isArray(stats.level_distribution) ? stats.level_distribution : [];
+      if (!rows.length) {
+        distribution.append(dcxAdminText('p', 'No account level data available.', 'font-size:12px;opacity:.75'));
+      } else {
+        const table = document.createElement('table');
+        table.style.cssText = 'width:100%;border-collapse:collapse;font-size:13px';
+        const head = document.createElement('tr');
+        for (const title of ['ACCOUNT LEVEL', 'TOTAL USERS']) {
+          const th = dcxAdminText('th', title, 'text-align:left;padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.16)');
+          head.append(th);
+        }
+        table.append(head);
+        for (const item of rows) {
+          const tr = document.createElement('tr');
+          const level = item.level === 'Unassigned' ? 'Unassigned' : 'Level ' + item.level;
+          tr.append(
+            dcxAdminText('td', level, 'padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.08)'),
+            dcxAdminText('td', Number(item.users || 0).toLocaleString('en-US'), 'padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.08);text-align:right')
+          );
+          table.append(tr);
+        }
+        distribution.append(table);
+      }
+    }
     message.textContent = 'Last updated: ' + new Date(stats.generated_at || Date.now()).toLocaleString();
   } catch (error) {
     message.textContent = error.message || 'Unable to load admin statistics.';
