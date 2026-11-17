@@ -973,6 +973,15 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
     <p class="small" id="dcxAdminStatsUpdated">Statistics are available to authorized admins only.</p>
   </div>
   <div class="card">
+    <h3>User Management</h3>
+    <p class="small">Find an account using its exact Telegram ID. This page is read-only; balances and account settings cannot be changed here.</p>
+    <label class="label" for="dcxAdminUserSearchId">TELEGRAM USER ID</label>
+    <input id="dcxAdminUserSearchId" type="text" inputmode="numeric" maxlength="20" autocomplete="off" placeholder="Enter Telegram ID">
+    <button class="secondary" id="dcxAdminUserSearchBtn" onclick="dcxAdminFindUser()">SEARCH USER</button>
+    <p class="small" id="dcxAdminUserSearchMessage">Enter a Telegram ID to view account information.</p>
+    <div id="dcxAdminUserResult"></div>
+  </div>
+  <div class="card">
     <h3>Withdrawal Queue</h3>
     <p class="small">Review requests below. Send DCX manually from the Payout Wallet only after checking the verified destination.</p>
     <button class="secondary" id="dcxRefreshWithdrawalsBtn" onclick="dcxLoadWithdrawals()">REFRESH WITHDRAWAL QUEUE</button>
@@ -1919,6 +1928,60 @@ function dcxAdminText(tag, value, style = '') {
   node.textContent = value == null ? '' : String(value);
   if (style) node.style.cssText = style;
   return node;
+}
+
+async function dcxAdminFindUser() {
+  const input = document.getElementById('dcxAdminUserSearchId');
+  const button = document.getElementById('dcxAdminUserSearchBtn');
+  const message = document.getElementById('dcxAdminUserSearchMessage');
+  const resultBox = document.getElementById('dcxAdminUserResult');
+  if (!input || !button || !message || !resultBox) return;
+  const telegramId = String(input.value || '').trim();
+  resultBox.replaceChildren();
+  if (!/^[0-9]{5,20}$/.test(telegramId)) {
+    message.textContent = 'Enter a valid Telegram ID containing 5–20 digits.';
+    return;
+  }
+  button.disabled = true;
+  message.textContent = 'Searching for the account...';
+  try {
+    const response = await dcxWithdrawApi('admin_user_lookup', { telegramId });
+    if (!response.user) {
+      message.textContent = 'No account was found with Telegram ID ' + telegramId + '.';
+      return;
+    }
+    const user = response.user;
+    const details = [
+      ['Telegram ID', user.telegram_id],
+      ['Username', user.username ? '@' + String(user.username).replace(/^@/, '') : 'Not set'],
+      ['DCX Balance', Number(user.balance || 0).toLocaleString('en-US') + ' DCX'],
+      ['Account Created', user.created_at ? new Date(user.created_at).toLocaleString() : 'Unavailable'],
+      ['Mining Started', user.mining_started_at ? new Date(user.mining_started_at).toLocaleString() : 'Not started'],
+      ['Last Mining Claim', (user.mining_last_claim_at || user.mining_last_claimed_at) ? new Date(user.mining_last_claim_at || user.mining_last_claimed_at).toLocaleString() : 'No claim recorded'],
+      ['Wallet Status', user.wallet_verified ? 'VERIFIED' : (user.wallet_address ? 'CONNECTED — NOT VERIFIED' : 'NOT CONNECTED')],
+      ['TON Wallet', user.wallet_address || 'No wallet connected'],
+      ['Wallet Verified At', user.wallet_verified_at ? new Date(user.wallet_verified_at).toLocaleString() : 'Not verified'],
+      ['Verified DCX Holding', Number(user.wallet_balance_dcx || 0).toLocaleString('en-US') + ' DCX'],
+      ['Holding Last Checked', user.wallet_balance_checked_at ? new Date(user.wallet_balance_checked_at).toLocaleString() : 'Not checked'],
+      ['Mining Level', 'Level ' + Number(user.level || 1)]
+    ];
+    const card = document.createElement('div');
+    card.className = 'level';
+    details.forEach(([label, value]) => {
+      const line = document.createElement('p');
+      line.style.cssText = 'margin:7px 0;font-size:12px;line-height:1.5;overflow-wrap:anywhere';
+      const strong = document.createElement('b');
+      strong.textContent = label + ': ';
+      line.append(strong, document.createTextNode(String(value)));
+      card.append(line);
+    });
+    resultBox.append(card);
+    message.textContent = 'Account found. Information is displayed in read-only mode.';
+  } catch (error) {
+    message.textContent = error.message || 'Unable to search for this account.';
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function dcxLoadWithdrawals() {
