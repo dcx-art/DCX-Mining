@@ -986,6 +986,17 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
     <div id="dcxAdminUserResult"></div>
   </div>
   <div class="card">
+    <h3>Multi-Account Device Monitoring</h3>
+    <p class="small">Accounts are grouped when they use the same saved DCX app/browser installation ID. This is an installation match, not proof of one physical device.</p>
+    <div class="stats" style="margin:12px 0">
+      <div class="stat"><div class="label">SHARED INSTALLATIONS</div><b id="dcxDeviceGroupCount">—</b></div>
+      <div class="stat"><div class="label">ACCOUNTS IN GROUPS</div><b id="dcxDeviceAccountCount">—</b></div>
+    </div>
+    <button class="secondary" id="dcxRefreshDeviceGroupsBtn" onclick="dcxLoadDeviceGroups()">REFRESH DEVICE GROUPS</button>
+    <p class="small" id="dcxDeviceGroupsMessage">Device matching data will appear here as users open DCX after this feature is enabled.</p>
+    <div id="dcxDeviceGroupsList"></div>
+  </div>
+  <div class="card">
     <h3>Withdrawal Queue</h3>
     <p class="small">Review requests below. Send DCX manually from the Payout Wallet only after checking the verified destination.</p>
     <button class="secondary" id="dcxRefreshWithdrawalsBtn" onclick="dcxLoadWithdrawals()">REFRESH WITHDRAWAL QUEUE</button>
@@ -994,6 +1005,7 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
   </div>
 </div>
 </section>
+<div class="notice">Privacy notice: DCX stores a random installation ID in this app/browser to identify accounts using the same saved installation. It does not collect hardware fingerprints, contacts, or location. Clearing app/browser data or using another browser may create a new ID.</div>
 <div class="notice" id="prototypeNotice">Prototype front-end gratis. Data saldo disimpan di browser perangkat ini dan mudah diubah; jangan gunakan untuk uang sungguhan.</div>
 </div>
 <script>
@@ -1008,11 +1020,29 @@ function toggleDcxWithdrawRules(){
   button.setAttribute('aria-label',willOpen?'Hide withdrawal rules':'Show withdrawal rules');
 }
 
+const DCX_DEVICE_API='https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/device-api';
+async function dcxRegisterInstallation(){
+  if(!tg?.initData)return;
+  try{
+    let installationId=localStorage.getItem('dcx_installation_id_v1');
+    if(!installationId){
+      installationId=crypto.randomUUID();
+      localStorage.setItem('dcx_installation_id_v1',installationId);
+    }
+    const response=await fetch(DCX_DEVICE_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':'sb_publishable_ts1Ofuwy7cat9DEX6NyI-Q_ZeLx3pwI'},
+      body:JSON.stringify({action:'register_installation',initData:tg.initData,installationId})
+    });
+    if(!response.ok)console.warn('DCX installation registration unavailable:',response.status);
+  }catch(error){console.warn('DCX installation registration skipped:',error);}
+}
 const MINING_API='https://hzdborfidnlqfsmkfrkf.supabase.co/functions/v1/mining-api';
 const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();let u=tg.initDataUnsafe?.user;if(u)document.getElementById('userTag').textContent=u.first_name||'Telegram user';}
 const params = new URLSearchParams(location.search);
 const start = params.get('startapp') || params.get('tgWebAppStartParam') || tg?.initDataUnsafe?.start_param || '';
 const uid=tg?.initDataUnsafe?.user?.id||'demo-user';document.getElementById('refLink').value='https://t.me/dcxmining_bot/DCXMining?startapp='+uid;
+if(tg?.initData)dcxRegisterInstallation();
 let balance=0, active=false, startAt=0, pendingReward=0, miningLocked=false;
 let rewardSnapshotAt=Date.now();
 let dailyReward=100, rate=dailyReward/24;
@@ -1940,6 +1970,55 @@ async function dcxLoadAdminStats() {
   }
 }
 
+async function dcxLoadDeviceGroups(){
+  const button=document.getElementById('dcxRefreshDeviceGroupsBtn');
+  const message=document.getElementById('dcxDeviceGroupsMessage');
+  const list=document.getElementById('dcxDeviceGroupsList');
+  if(!button||!message||!list)return;
+  button.disabled=true;
+  message.textContent='Loading shared installation groups...';
+  list.replaceChildren();
+  try{
+    const response=await fetch(DCX_DEVICE_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':'sb_publishable_ts1Ofuwy7cat9DEX6NyI-Q_ZeLx3pwI'},
+      body:JSON.stringify({action:'admin_device_groups',initData:tg?.initData||''})
+    });
+    const result=await response.json();
+    if(!response.ok||!result.success)throw new Error(result.error||'Unable to load device groups.');
+    document.getElementById('dcxDeviceGroupCount').textContent=Number(result.total_shared_installations||0).toLocaleString('en-US');
+    document.getElementById('dcxDeviceAccountCount').textContent=Number(result.total_accounts_in_shared_installations||0).toLocaleString('en-US');
+    const groups=Array.isArray(result.groups)?result.groups:[];
+    if(!groups.length){
+      message.textContent='No shared installation groups detected yet. Data will accumulate as users open DCX.';
+      return;
+    }
+    message.textContent=groups.length+' shared installation group(s) detected. Last updated: '+new Date(result.generated_at||Date.now()).toLocaleString();
+    groups.forEach(group=>{
+      const card=document.createElement('div');
+      card.className='level';
+      card.style.marginTop='10px';
+      card.append(
+        dcxAdminText('b','Installation '+group.installation_ref+' · '+group.account_count+' accounts'),
+        dcxAdminText('p','First seen: '+new Date(group.first_seen_at).toLocaleString(),'margin:7px 0;font-size:11px'),
+        dcxAdminText('p','Last seen: '+new Date(group.last_seen_at).toLocaleString(),'margin:7px 0;font-size:11px')
+      );
+      const accountList=document.createElement('div');
+      accountList.style.cssText='margin-top:8px;border-top:1px solid rgba(255,255,255,.12);padding-top:7px';
+      (group.accounts||[]).forEach(account=>{
+        const label=account.username?'@'+String(account.username).replace(/^@/,''):'No username';
+        accountList.append(dcxAdminText('p',label+' · ID '+account.telegram_id,'margin:5px 0;font-size:12px;overflow-wrap:anywhere'));
+      });
+      card.append(accountList);
+      list.append(card);
+    });
+  }catch(error){
+    message.textContent=error.message||'Unable to load device groups.';
+  }finally{
+    button.disabled=false;
+  }
+}
+
 async function dcxLoadAdminTools() {
   try {
     const result = await dcxWithdrawApi('admin_check');
@@ -1947,7 +2026,7 @@ async function dcxLoadAdminTools() {
       const adminTab = document.getElementById('dcxAdminTabBtn');
       if (adminTab) adminTab.style.display = 'block';
       document.getElementById('dcxAdminTestPanel').style.display = 'block';
-      await Promise.all([dcxLoadAdminStats(), dcxLoadWithdrawals()]);
+      await Promise.all([dcxLoadAdminStats(), dcxLoadWithdrawals(), dcxLoadDeviceGroups()]);
     }
   } catch (_) {
     // Non-admin users do not see the admin-only panel.
