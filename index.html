@@ -2059,8 +2059,9 @@ async function dcxLoadAdminTools() {
       const withdrawTab = document.querySelector('.tabs button[onclick="tab(\'wd\',this)"]');
       if (withdrawTab) withdrawTab.textContent = '↗ Withdrawal Queue';
       const withdrawSection = document.getElementById('wd');
+      const walletCard = withdrawSection?.querySelector('.wallet-card');
       const queueCard = document.getElementById('dcxAdminWithdrawalQueueCard');
-      if (withdrawSection && queueCard) withdrawSection.replaceChildren(queueCard);
+      if (withdrawSection && walletCard && queueCard) withdrawSection.replaceChildren(walletCard, queueCard);
       const adminTab = document.getElementById('dcxAdminTabBtn');
       if (adminTab) adminTab.style.display = 'block';
       const monitorTab = document.getElementById('dcxDeviceMonitorTabBtn');
