@@ -1200,7 +1200,7 @@ if(connectionStatus){
     btn.disabled=false;
   }
 }
-function tab(id,btn){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));section.classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();if(id==='wd'){if(window.dcxIsAdmin)dcxLoadWithdrawals();else dcxLoadMyWithdrawals();}if(id==='admin'){dcxLoadAdminStats();dcxLoadWithdrawals();}if(id==='device-monitoring')dcxLoadDeviceGroups();}
+function tab(id,btn){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));section.classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();if(id==='wd'){if(window.dcxIsAdmin)dcxLoadWithdrawals();else dcxLoadMyWithdrawals();}if(id==='level')loadLevelRules(Boolean(window.dcxWalletAdminExempt));if(id==='admin'){dcxLoadAdminStats();dcxLoadWithdrawals();}if(id==='device-monitoring')dcxLoadDeviceGroups();}
 function copyRef(){navigator.clipboard?.writeText(document.getElementById('refLink').value).then(()=>alert('Link disalin')); }
 function setMaxWithdraw(){document.getElementById("amount").value=Math.floor(Number(balance)||0);document.getElementById("wdmsg").textContent="Maximum available whole-number balance filled."; }
 async function withdraw(){
@@ -1517,11 +1517,12 @@ function formatDcx(value) {
   return Number(value || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
 }
 
-async function loadLevelRules() {
+async function loadLevelRules(adminExempt = false) {
   const list = document.getElementById('levelRulesList');
   if (!list) return;
   const walletStatus = document.getElementById('walletVerifyStatus')?.textContent;
-  const verified = walletStatus === 'VERIFIED' || walletStatus === 'ADMIN — EXEMPT';
+  const isAdminExempt = adminExempt || walletStatus === 'ADMIN — EXEMPT';
+  const verified = walletStatus === 'VERIFIED' || isAdminExempt;
   if (!verified) {
     document.getElementById('levelIntro').textContent = 'Verify your TON wallet to activate your level information.';
     document.getElementById('levelCurrent').textContent = '—';
@@ -1534,7 +1535,7 @@ async function loadLevelRules() {
     const result = await walletRequest('level_rules');
     const currentLevel = Number(document.getElementById('walletLevel')?.textContent.replace(/[^0-9]/g, '') || 1);
     const holding = Number((document.getElementById('walletHolding')?.textContent || '0').replace(/,/g, '').replace(/[^0-9.]/g, '') || 0);
-    document.getElementById('levelIntro').textContent = walletStatus === 'ADMIN — EXEMPT' ? 'Admin account: wallet verification is not required for mining. Explore all 100 DCX levels.' : 'Your wallet is verified. Explore all 100 DCX levels and their daily rewards.';
+    document.getElementById('levelIntro').textContent = isAdminExempt ? 'Admin account: wallet verification is not required. Explore all 100 DCX levels and their daily rewards.' : 'Your wallet is verified. Explore all 100 DCX levels and their daily rewards.';
     document.getElementById('levelCurrent').textContent = 'Level ' + currentLevel;
     document.getElementById('levelHolding').textContent = formatDcx(holding) + ' DCX';
     document.getElementById('levelListMessage').textContent = (result.rules || []).length + ' levels · Sorted from Level 1 to Level 100 · Daily reward includes base and bonus.';
@@ -1758,14 +1759,14 @@ async function loadWalletStatus() {
     document.getElementById('walletAddressText').textContent = result.wallet_address ? formatTonFriendlyAddress(result.wallet_address) : (result.admin_exempt ? 'Wallet verification is not required for admin mining.' : 'No wallet connected yet.');
     document.getElementById('walletLevel').textContent = 'Level ' + Number(result.level || 1);
     document.getElementById('walletHolding').textContent = Number(result.wallet_balance_dcx || 0).toLocaleString('en-US') + ' DCX';
-    if (result.wallet_verified || result.admin_exempt) await loadLevelRules();
+    window.dcxWalletAdminExempt = Boolean(result.admin_exempt);
+    if (result.wallet_verified || result.admin_exempt) await loadLevelRules(Boolean(result.admin_exempt));
     document.getElementById('walletCheckedAt').textContent = result.wallet_balance_checked_at ? 'Last checked: ' + new Date(result.wallet_balance_checked_at).toLocaleString() : 'DCX holding has not been checked yet.';
     document.getElementById('walletPaymentPanel').style.display = !result.admin_exempt && result.wallet_address && !result.wallet_verified ? 'block' : 'none';
     document.getElementById('beginWalletVerificationBtn').style.display = (result.wallet_verified || result.admin_exempt) ? 'none' : 'block';
     if (result.admin_exempt) {
       document.getElementById('walletPaymentDetails').style.display = 'none';
       message.textContent = 'Admin account: wallet verification is not required for mining. Connect a TON wallet only if you need wallet-based features.';
-      loadLevelRules();
     } else if (result.wallet_verified) {
       message.textContent = 'Wallet verified successfully.';
       document.getElementById('walletPaymentDetails').style.display = 'none';
