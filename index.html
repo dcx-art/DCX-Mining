@@ -1979,7 +1979,7 @@ async function dcxLoadDeviceGroups(){
   const list=document.getElementById('dcxDeviceGroupsList');
   if(!button||!message||!list)return;
   button.disabled=true;
-  message.textContent='Loading shared installation groups...';
+  message.textContent='Loading device monitoring data...';
   list.replaceChildren();
   try{
     const response=await fetch(DCX_DEVICE_API,{
@@ -1988,35 +1988,64 @@ async function dcxLoadDeviceGroups(){
       body:JSON.stringify({action:'admin_device_groups',initData:tg?.initData||''})
     });
     const result=await response.json();
-    if(!response.ok||!result.success)throw new Error(result.error||'Unable to load device groups.');
-    document.getElementById('dcxDeviceGroupCount').textContent=Number(result.total_shared_installations||0).toLocaleString('en-US');
-    document.getElementById('dcxDeviceAccountCount').textContent=Number(result.total_accounts_in_shared_installations||0).toLocaleString('en-US');
-    const groups=Array.isArray(result.groups)?result.groups:[];
-    if(!groups.length){
-      message.textContent='No shared installation groups detected yet. Data will accumulate as users open DCX.';
-      return;
-    }
-    message.textContent=groups.length+' shared installation group(s) detected. Last updated: '+new Date(result.generated_at||Date.now()).toLocaleString();
-    groups.forEach(group=>{
-      const card=document.createElement('div');
-      card.className='level';
-      card.style.marginTop='10px';
-      card.append(
-        dcxAdminText('b','Installation '+group.installation_ref+' · '+group.account_count+' accounts'),
-        dcxAdminText('p','First seen: '+new Date(group.first_seen_at).toLocaleString(),'margin:7px 0;font-size:11px'),
-        dcxAdminText('p','Last seen: '+new Date(group.last_seen_at).toLocaleString(),'margin:7px 0;font-size:11px')
-      );
+    if(!response.ok||!result.success)throw new Error(result.error||'Unable to load device monitoring data.');
+    const exactGroups=Array.isArray(result.groups)?result.groups:[];
+    const candidates=Array.isArray(result.signal_candidates)?result.signal_candidates:[];
+    document.getElementById('dcxDeviceGroupCount').textContent=Number(result.total_signal_candidate_groups||0).toLocaleString('en-US');
+    document.getElementById('dcxDeviceAccountCount').textContent=Number(result.total_accounts_in_signal_candidates||0).toLocaleString('en-US');
+    const makeAccountList=(accounts)=>{
       const accountList=document.createElement('div');
       accountList.style.cssText='margin-top:8px;border-top:1px solid rgba(255,255,255,.12);padding-top:7px';
-      (group.accounts||[]).forEach(account=>{
+      (accounts||[]).forEach(account=>{
         const label=account.username?'@'+String(account.username).replace(/^@/,''):'No username';
-        accountList.append(dcxAdminText('p',label+' · ID '+account.telegram_id,'margin:5px 0;font-size:12px;overflow-wrap:anywhere'));
+        const w=account.withdrawals||{};
+        const summary='Withdrawals: '+Number(w.count||0)+' request(s), '+Number(w.total_amount||0).toLocaleString('en-US')+' DCX total · pending '+Number(w.pending_count||0)+' · completed '+Number(w.completed_count||0);
+        accountList.append(
+          dcxAdminText('p',label+' · ID '+account.telegram_id,'margin:5px 0;font-size:12px;overflow-wrap:anywhere'),
+          dcxAdminText('p',summary,'margin:3px 0 9px 10px;font-size:11px;opacity:.8;overflow-wrap:anywhere')
+        );
       });
-      card.append(accountList);
-      list.append(card);
-    });
+      return accountList;
+    };
+    if(!exactGroups.length&&!candidates.length){
+      message.textContent='No shared installation or matching environment candidates yet. Data will accumulate as users open DCX.';
+      return;
+    }
+    message.textContent='Updated '+new Date(result.generated_at||Date.now()).toLocaleString()+'. Candidate matches require manual review and are not proof of one physical device.';
+    if(candidates.length){
+      list.append(dcxAdminText('b','POTENTIAL DEVICE MATCHES ('+candidates.length+')','display:block;margin-top:12px'));
+      candidates.forEach(group=>{
+        const card=document.createElement('div');
+        card.className='level';
+        card.style.marginTop='10px';
+        card.append(
+          dcxAdminText('b','Similar environment · '+group.account_count+' accounts'),
+          dcxAdminText('p','Reference: '+group.signal_ref+' · '+group.installation_count+' installation(s)','margin:7px 0;font-size:11px'),
+          dcxAdminText('p','Last seen: '+new Date(group.last_seen_at).toLocaleString(),'margin:7px 0;font-size:11px'),
+          dcxAdminText('p','Signals: '+Object.entries(group.signal_summary||{}).map(([k,v])=>k.replace(/_/g,' ')+': '+v).join(' · '),'margin:7px 0;font-size:11px;overflow-wrap:anywhere'),
+          dcxAdminText('p','Review only: different devices may share these settings. Do not restrict accounts based on this match alone.','margin:7px 0;font-size:11px;color:#f2c879')
+        );
+        card.append(makeAccountList(group.accounts));
+        list.append(card);
+      });
+    }
+    if(exactGroups.length){
+      list.append(dcxAdminText('b','SHARED INSTALLATION IDs ('+exactGroups.length+')','display:block;margin-top:16px'));
+      exactGroups.forEach(group=>{
+        const card=document.createElement('div');
+        card.className='level';
+        card.style.marginTop='10px';
+        card.append(
+          dcxAdminText('b','Installation '+group.installation_ref+' · '+group.account_count+' accounts'),
+          dcxAdminText('p','First seen: '+new Date(group.first_seen_at).toLocaleString(),'margin:7px 0;font-size:11px'),
+          dcxAdminText('p','Last seen: '+new Date(group.last_seen_at).toLocaleString(),'margin:7px 0;font-size:11px')
+        );
+        card.append(makeAccountList(group.accounts));
+        list.append(card);
+      });
+    }
   }catch(error){
-    message.textContent=error.message||'Unable to load device groups.';
+    message.textContent=error.message||'Unable to load device monitoring data.';
   }finally{
     button.disabled=false;
   }
