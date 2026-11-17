@@ -2021,6 +2021,7 @@ async function dcxLoadDeviceGroups(){
         card.append(
           dcxAdminText('b','Similar environment · '+group.account_count+' accounts'),
           dcxAdminText('p','Reference: '+group.signal_ref+' · '+group.installation_count+' installation(s)','margin:7px 0;font-size:11px'),
+          dcxAdminText('p','Minimum pair similarity: '+Number(group.minimum_similarity_percent||0)+'% (5 of 6 signals required)','margin:7px 0;font-size:11px'),
           dcxAdminText('p','Last seen: '+new Date(group.last_seen_at).toLocaleString(),'margin:7px 0;font-size:11px'),
           dcxAdminText('p','Signals: '+Object.entries(group.signal_summary||{}).map(([k,v])=>k.replace(/_/g,' ')+': '+v).join(' · '),'margin:7px 0;font-size:11px;overflow-wrap:anywhere'),
           dcxAdminText('p','Review only: different devices may share these settings. Do not restrict accounts based on this match alone.','margin:7px 0;font-size:11px;color:#f2c879')
