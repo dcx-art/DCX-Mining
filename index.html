@@ -843,7 +843,7 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
     </div>
   </div>
 </div>
-<div class="tabs"><button class="active" onclick="tab('mine',this)">⛏ Mining</button><button class="secondary" onclick="tab('ref',this)">♧ Referral</button><button class="secondary" onclick="tab('level',this)">⚡ Level</button><button class="secondary" onclick="tab('wd',this)">↗ Withdraw</button><button class="secondary" id="dcxAdminTabBtn" style="display:none" onclick="tab('admin',this)">★ Admin</button></div>
+<div class="tabs"><button class="active" onclick="tab('mine',this)">⛏ Mining</button><button class="secondary" onclick="tab('ref',this)">♧ Referral</button><button class="secondary" onclick="tab('level',this)">⚡ Level</button><button class="secondary" onclick="tab('wd',this)">↗ Withdraw</button><button class="secondary" id="dcxAdminTabBtn" style="display:none" onclick="tab('admin',this)">★ Admin</button><button class="secondary" id="dcxDeviceMonitorTabBtn" style="display:none" onclick="tab('device-monitoring',this)">⌕ Multi-Account</button></div>
 <section id="mine" class="section show">
 <div class="card mining"><a class="dcx-checkin-top dcx-official-top" href="https://t.me/dcxchanel" target="_blank" rel="noopener noreferrer">OFFICIAL DCX</a><button type="button" class="dcx-checkin-top" onclick="openDailyCheckin()">CHECK IN</button><div class="orb" id="orb">
   <img src="https://dcx-art.github.io/DCX-Mining/dcx-coin.png?v=2"
@@ -986,6 +986,20 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
     <div id="dcxAdminUserResult"></div>
   </div>
   <div class="card">
+    <h3>Withdrawal Queue</h3>
+    <p class="small">Review requests below. Send DCX manually from the Payout Wallet only after checking the verified destination.</p>
+    <button class="secondary" id="dcxRefreshWithdrawalsBtn" onclick="dcxLoadWithdrawals()">REFRESH WITHDRAWAL QUEUE</button>
+    <p class="small" id="dcxWithdrawalsMessage">Press refresh to load requests.</p>
+    <div id="dcxWithdrawalsList"></div>
+  </div>
+</div>
+
+</section>
+<section id="device-monitoring" class="section" aria-label="Multi-Account Monitoring">
+  <div class="card">
+    <h3>Multi-Account Device Monitoring</h3>
+    <p class="small">Dedicated admin workspace for reviewing possible account links. Similarity matches are indicators only, not proof of one physical device.</p>
+  <div class="card">
     <h3>Multi-Account Device Monitoring</h3>
     <p class="small">DCX compares saved installation IDs and limited browser/device environment signals to identify possible account links. Matches are indicators for admin review, not proof of one physical device.</p>
     <div class="stats" style="margin:12px 0">
@@ -996,14 +1010,7 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
     <p class="small" id="dcxDeviceGroupsMessage">Device matching data will appear here as users open DCX after this feature is enabled.</p>
     <div id="dcxDeviceGroupsList"></div>
   </div>
-  <div class="card">
-    <h3>Withdrawal Queue</h3>
-    <p class="small">Review requests below. Send DCX manually from the Payout Wallet only after checking the verified destination.</p>
-    <button class="secondary" id="dcxRefreshWithdrawalsBtn" onclick="dcxLoadWithdrawals()">REFRESH WITHDRAWAL QUEUE</button>
-    <p class="small" id="dcxWithdrawalsMessage">Press refresh to load requests.</p>
-    <div id="dcxWithdrawalsList"></div>
-  </div>
-</div>
+
 </section>
 <div class="notice" id="prototypeNotice">Prototype front-end gratis. Data saldo disimpan di browser perangkat ini dan mudah diubah; jangan gunakan untuk uang sungguhan.</div>
 </div>
@@ -1196,7 +1203,7 @@ if(connectionStatus){
     btn.disabled=false;
   }
 }
-function tab(id,btn){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));section.classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();if(id==='wd')dcxLoadMyWithdrawals();if(id==='admin'){dcxLoadAdminStats();dcxLoadWithdrawals();}}
+function tab(id,btn){const section=document.getElementById(id);if(!section)return;document.querySelectorAll('.section').forEach(x=>x.classList.remove('show'));section.classList.add('show');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');if(id==='level')loadLevelRules();if(id==='wd')dcxLoadMyWithdrawals();if(id==='admin'){dcxLoadAdminStats();dcxLoadWithdrawals();}if(id==='device-monitoring')dcxLoadDeviceGroups();}
 function copyRef(){navigator.clipboard?.writeText(document.getElementById('refLink').value).then(()=>alert('Link disalin')); }
 function setMaxWithdraw(){document.getElementById("amount").value=Math.floor(Number(balance)||0);document.getElementById("wdmsg").textContent="Maximum available whole-number balance filled."; }
 async function withdraw(){
@@ -2085,8 +2092,10 @@ async function dcxLoadAdminTools() {
     if (result.is_admin) {
       const adminTab = document.getElementById('dcxAdminTabBtn');
       if (adminTab) adminTab.style.display = 'block';
+      const monitorTab = document.getElementById('dcxDeviceMonitorTabBtn');
+      if (monitorTab) monitorTab.style.display = 'block';
       document.getElementById('dcxAdminTestPanel').style.display = 'block';
-      await Promise.all([dcxLoadAdminStats(), dcxLoadWithdrawals(), dcxLoadDeviceGroups()]);
+      await Promise.all([dcxLoadAdminStats(), dcxLoadWithdrawals()]);
     }
   } catch (_) {
     // Non-admin users do not see the admin-only panel.
