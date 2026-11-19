@@ -1642,7 +1642,23 @@ async function initializeTonConnect() {
         await loadWalletStatus();
         // Keep the authoritative message set by loadWalletStatus; verified wallets need no further verification prompt.
       } catch (error) {
-        message.textContent = error.message || 'Wallet connected, but saving the address failed.';
+        const errorMessage = error?.message || 'Wallet connected, but saving the address failed.';
+        const walletAlreadyBoundElsewhere =
+          /wallet ini sudah (?:terkunci permanen pada akun telegram lain|terhubung atau terkunci pada akun dcx lain)/i.test(errorMessage) ||
+          /akun telegram ini sudah memiliki wallet verified yang terkunci/i.test(errorMessage) ||
+          /wallet akun ini sudah verified dan tidak dapat diganti/i.test(errorMessage);
+
+        if (walletAlreadyBoundElsewhere) {
+          message.textContent = 'This wallet is already permanently linked to another DCX account. Disconnecting it from this session. Please connect a different wallet.';
+          try {
+            await tonConnectUI.disconnect();
+          } catch (disconnectError) {
+            console.warn('TON Connect cleanup after wallet rejection failed:', disconnectError);
+          }
+          button.textContent = 'CONNECT ANOTHER WALLET';
+        } else {
+          message.textContent = errorMessage;
+        }
       } finally {
         button.disabled = false;
       }
