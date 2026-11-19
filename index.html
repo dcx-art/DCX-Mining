@@ -1608,6 +1608,10 @@ async function loadLevelRules(adminExempt = false) {
 
 async function connectWallet() {
   const message = document.getElementById('walletStatusMessage');
+  if (document.getElementById('walletVerifyStatus')?.textContent === 'VERIFIED') {
+    message.textContent = 'Your wallet is already verified. Connecting another wallet is disabled.';
+    return;
+  }
   if (!tonConnectUI) {
     message.textContent = 'Wallet selector is still loading. Please try again in a moment.';
     return;
@@ -1660,7 +1664,7 @@ async function initializeTonConnect() {
           message.textContent = errorMessage;
         }
       } finally {
-        button.disabled = false;
+        button.disabled = document.getElementById('walletVerifyStatus')?.textContent === 'VERIFIED';
       }
     });
     await tonConnectUI.connectionRestored;
@@ -1820,6 +1824,12 @@ async function loadWalletStatus() {
   try {
     const result = await walletRequest('status');
     button.style.display = result.wallet_verified ? 'block' : 'none';
+    const connectButton = document.getElementById('connectWalletBtn');
+    if (connectButton) {
+      connectButton.disabled = Boolean(result.wallet_verified);
+      connectButton.textContent = result.wallet_verified ? 'WALLET VERIFIED' : 'CONNECT WALLET';
+      connectButton.title = result.wallet_verified ? 'This wallet is already verified and cannot be changed here.' : '';
+    }
     document.getElementById('walletVerifyStatus').textContent = result.admin_exempt ? 'ADMIN — EXEMPT' : (result.wallet_verified ? 'VERIFIED' : (result.wallet_address ? 'CONNECTED — NOT VERIFIED' : 'NOT CONNECTED'));
      document.getElementById('walletVerifyStatus').style.color = result.wallet_verified ? '#43f5a5' : '';
     document.getElementById('walletVerificationNotice').style.display = (!result.wallet_verified && !result.admin_exempt && miningLocked) ? 'block' : 'none';
