@@ -94,18 +94,12 @@ white-space:nowrap;
 color:#43f5a5;
 text-shadow:0 0 8px rgba(67,245,165,.35);
 }
-.dcx-jetton-box{
-display:flex;align-items:center;gap:9px;margin:10px 0 8px;padding:9px 10px;
-border:1px solid rgba(83,153,220,.35);border-radius:12px;
-background:linear-gradient(135deg,rgba(18,43,73,.92),rgba(10,22,40,.92));position:relative;
-}
-.dcx-jetton-info{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px;}
-.dcx-jetton-title{color:var(--muted);font-size:9px;font-weight:800;letter-spacing:1px;}
-.dcx-jetton-address{color:#d9e8ff;font-size:10px;line-height:1.45;overflow-wrap:anywhere;word-break:break-all;font-family:monospace;}
-.dcx-jetton-copy{flex:0 0 32px;width:32px;height:32px;padding:7px;border:1px solid rgba(91,174,255,.45);border-radius:9px;background:rgba(39,116,190,.2);color:#8bc8ff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.dcx-jetton-copy svg{width:18px;height:18px;}
+.dcx-jetton-inline{display:flex;align-items:center;gap:5px;min-width:0;max-width:68%;padding:3px 5px;border:1px solid rgba(83,153,220,.28);border-radius:8px;background:rgba(18,43,73,.48);}
+.dcx-jetton-address{color:#bcd5f4;font-size:9px;line-height:1.2;white-space:nowrap;font-family:monospace;letter-spacing:-.35px;}
+.dcx-jetton-copy{flex:0 0 22px;width:22px;height:22px;padding:4px;border:0;border-radius:6px;background:rgba(39,116,190,.18);color:#8bc8ff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.dcx-jetton-copy svg{width:14px;height:14px;}
 .dcx-jetton-copy:active{transform:scale(.94);}
-.dcx-jetton-copy-status{position:absolute;right:49px;bottom:2px;color:#43f5a5;font-size:9px;font-weight:700;}
+.dcx-jetton-copy-status{position:absolute;right:7px;top:30px;color:#43f5a5;font-size:9px;font-weight:700;}
 .balance{
 font-size:36px;
 font-weight:900;
@@ -846,16 +840,13 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
 <div class="card">
   <div class="balance-heading">
     <div class="label">TOTAL BALANCE</div>
-  </div>
-  <div class="dcx-jetton-box">
-    <div class="dcx-jetton-info">
-      <span class="dcx-jetton-title">DCX JETTON ADDRESS</span>
-      <span class="dcx-jetton-address" id="dcxJettonAddress">EQAqb3lOgY2ApGEwdw4EsivdluI7V9UNb6I21PolpPxqq39q</span>
+    <div class="dcx-jetton-inline" title="DCX Jetton Address">
+      <span class="dcx-jetton-address" id="dcxJettonAddress" data-address="EQAqb3lOgY2ApGEwdw4EsivdluI7V9UNb6I21PolpPxqq39q">EQAqb3…Pxqq39q</span>
+      <button type="button" class="dcx-jetton-copy" onclick="copyDcxJettonAddress()" aria-label="Copy full DCX Jetton address" title="Copy full address">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V5.8A1.8 1.8 0 0 0 14.2 4H5.8A1.8 1.8 0 0 0 4 5.8v8.4A1.8 1.8 0 0 0 5.8 16H8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <span class="dcx-jetton-copy-status" id="dcxJettonCopyStatus" aria-live="polite"></span>
     </div>
-    <button type="button" class="dcx-jetton-copy" onclick="copyDcxJettonAddress()" aria-label="Copy DCX Jetton address" title="Copy address">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V5.8A1.8 1.8 0 0 0 14.2 4H5.8A1.8 1.8 0 0 0 4 5.8v8.4A1.8 1.8 0 0 0 5.8 16H8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    </button>
-    <span class="dcx-jetton-copy-status" id="dcxJettonCopyStatus" aria-live="polite"></span>
   </div>
   <div class="balance">
     <span id="balance"><span id="balanceWhole">0</span><span id="balanceDecimal" class="balance-decimal">.0000</span></span>
@@ -1787,7 +1778,8 @@ async function copyWalletField(id) {
 }
 
 async function copyDcxJettonAddress() {
-  const address = document.getElementById('dcxJettonAddress')?.textContent?.trim();
+  const addressEl = document.getElementById('dcxJettonAddress');
+  const address = addressEl?.dataset?.address || addressEl?.textContent?.trim();
   const status = document.getElementById('dcxJettonCopyStatus');
   if (!address) return;
   try {
