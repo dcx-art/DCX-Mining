@@ -67,7 +67,7 @@ align-items:flex-start;
 justify-content:space-between;
 gap:8px;
 }
-.dcx-jetton-group{display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-top:7px;min-width:0;max-width:68%;}
+.dcx-jetton-group{display:flex;flex-direction:column;align-items:flex-start;gap:3px;margin-top:7px;margin-right:28px;width:190px;max-width:calc(100% - 205px);min-width:0;flex:0 1 190px;}
 .dcx-jetton-caption{color:var(--muted);font-size:8px;font-weight:800;letter-spacing:1px;line-height:1.2;}
 .balance-heading .label{
 display:inline-block;
@@ -96,10 +96,10 @@ white-space:nowrap;
 color:#43f5a5;
 text-shadow:0 0 8px rgba(67,245,165,.35);
 }
-.dcx-jetton-inline{display:flex;align-items:center;gap:5px;min-width:0;max-width:68%;padding:3px 5px;border:1px solid rgba(83,153,220,.28);border-radius:8px;background:rgba(18,43,73,.48);}
-.dcx-jetton-address{color:#bcd5f4;font-size:9px;line-height:1.2;white-space:nowrap;font-family:monospace;letter-spacing:-.35px;}
-.dcx-jetton-copy{flex:0 0 22px;width:22px;height:22px;padding:4px;border:0;border-radius:6px;background:rgba(39,116,190,.18);color:#8bc8ff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.dcx-jetton-copy svg{width:14px;height:14px;}
+.dcx-jetton-inline{display:flex;align-items:center;gap:5px;width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:3px 5px;border:1px solid rgba(83,153,220,.35);border-radius:8px;background:rgba(18,43,73,.58);}
+.dcx-jetton-address{display:block;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;color:#bcd5f4;font-size:9px;line-height:1.2;white-space:nowrap;font-family:monospace;letter-spacing:-.35px;}
+.dcx-jetton-copy{position:relative;z-index:2;flex:0 0 26px;width:26px;height:26px;padding:5px;border:1px solid rgba(91,174,255,.5);border-radius:7px;background:rgba(39,116,190,.28);color:#a8d8ff;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;}
+.dcx-jetton-copy svg{width:16px;height:16px;}
 .dcx-jetton-copy:active{transform:scale(.94);}
 .dcx-jetton-copy-status{position:absolute;right:7px;top:30px;color:#43f5a5;font-size:9px;font-weight:700;}
 .balance{
