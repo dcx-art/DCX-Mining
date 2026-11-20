@@ -63,10 +63,12 @@ letter-spacing:1.5px;
 }
 .balance-heading{
 display:flex;
-align-items:center;
+align-items:flex-start;
 justify-content:space-between;
 gap:8px;
 }
+.dcx-jetton-group{display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-top:7px;min-width:0;max-width:68%;}
+.dcx-jetton-caption{color:var(--muted);font-size:8px;font-weight:800;letter-spacing:1px;line-height:1.2;}
 .balance-heading .label{
 display:inline-block;
 padding:5px 9px;
@@ -840,12 +842,15 @@ function closeLevelInfo(){const modal=document.getElementById('dcxLevelInfoModal
 <div class="card">
   <div class="balance-heading">
     <div class="label">TOTAL BALANCE</div>
-    <div class="dcx-jetton-inline" title="DCX Jetton Address">
-      <span class="dcx-jetton-address" id="dcxJettonAddress" data-address="EQAqb3lOgY2ApGEwdw4EsivdluI7V9UNb6I21PolpPxqq39q">EQAqb3…Pxqq39q</span>
-      <button type="button" class="dcx-jetton-copy" onclick="copyDcxJettonAddress()" aria-label="Copy full DCX Jetton address" title="Copy full address">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V5.8A1.8 1.8 0 0 0 14.2 4H5.8A1.8 1.8 0 0 0 4 5.8v8.4A1.8 1.8 0 0 0 5.8 16H8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      </button>
-      <span class="dcx-jetton-copy-status" id="dcxJettonCopyStatus" aria-live="polite"></span>
+    <div class="dcx-jetton-group">
+      <span class="dcx-jetton-caption">JETTON ADDRESS</span>
+      <div class="dcx-jetton-inline" title="DCX Jetton Address">
+        <span class="dcx-jetton-address" id="dcxJettonAddress" data-address="EQAqb3lOgY2ApGEwdw4EsivdluI7V9UNb6I21PolpPxqq39q">EQAqb3…Pxqq39q</span>
+        <button type="button" class="dcx-jetton-copy" onclick="copyDcxJettonAddress()" aria-label="Copy full DCX Jetton address" title="Copy full address">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V5.8A1.8 1.8 0 0 0 14.2 4H5.8A1.8 1.8 0 0 0 4 5.8v8.4A1.8 1.8 0 0 0 5.8 16H8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <span class="dcx-jetton-copy-status" id="dcxJettonCopyStatus" aria-live="polite"></span>
+      </div>
     </div>
   </div>
   <div class="balance">
